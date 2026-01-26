@@ -1,23 +1,19 @@
 from fastapi import FastAPI
-from app.database import engine
-from app.models import Base
-from app.routes import users
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.auth import router as auth_router
 
-app = FastAPI()
+app = FastAPI(title="Restaurant Management System")
 
-# Allow React to call FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-Base.metadata.create_all(bind=engine)
-
-app.include_router(users.router)
+app.include_router(auth_router)
 
 @app.get("/")
 def root():
-    return {"message": "Backend working 🚀"}
+    return {"message": "Backend running"}
