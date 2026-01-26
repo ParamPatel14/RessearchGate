@@ -1,15 +1,46 @@
-const API_URL = "http://127.0.0.1:8000";
+import axios from "axios";
 
-export async function createUser(data) {
-  const res = await fetch(`${API_URL}/users/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return res.json();
-}
+const API_URL = "http://localhost:8000";
 
-export async function getUsers() {
-  const res = await fetch(`${API_URL}/users/`);
-  return res.json();
-}
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add a request interceptor to include the JWT token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export const login = async (email, password) => {
+  const response = await api.post("/auth/login", { email, password });
+  return response.data;
+};
+
+export const register = async (email, password, name) => {
+  const response = await api.post("/auth/register", { email, password, name });
+  return response.data;
+};
+
+export const getMe = async () => {
+  const response = await api.get("/users/me");
+  return response.data;
+};
+
+export const getUsers = async () => {
+  const response = await api.get("/users/");
+  return response.data;
+};
+
+export default api;
