@@ -4,7 +4,7 @@ from typing import List
 from app.db.database import get_db
 from app.db.models import Application, Opportunity, User
 from app.schemas import ApplicationCreate, ApplicationResponse, ApplicationUpdate
-from app.api.auth import get_current_user
+from app.deps import get_current_user
 
 router = APIRouter()
 
