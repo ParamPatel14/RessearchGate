@@ -54,6 +54,10 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   };
 
+  const refreshUser = async () => {
+    await fetchUser();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -63,6 +67,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         handleOAuthCallback,
+        refreshUser,
         isAuthenticated: !!user,
       }}
     >

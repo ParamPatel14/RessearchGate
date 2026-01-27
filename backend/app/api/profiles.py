@@ -141,5 +141,8 @@ def get_profile_completeness(
             "score": calculate_mentor_completeness(current_user.mentor_profile),
             "role": "mentor"
         }
+    elif current_user.role == "admin":
+        return {"score": 100, "role": "admin"}
     else:
-        return {"score": 100, "role": "admin"} # Admin is always complete
+        # For "user" role or others
+        return {"score": 0, "role": current_user.role}
