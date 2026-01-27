@@ -38,8 +38,8 @@ export const AuthProvider = ({ children }) => {
     await fetchUser();
   };
 
-  const register = async (email, password, name) => {
-    await apiRegister(email, password, name);
+  const register = async (email, password, name, role) => {
+    await apiRegister(email, password, name, role);
     // Automatically login after register or redirect to login? 
     // For now, let's just return and let component handle redirect to login
   };
