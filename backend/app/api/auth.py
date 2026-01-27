@@ -44,7 +44,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         password_hash=hashed_password,
         name=user.name,
         provider="local",
-        role="user"
+        role=user.role
     )
     db.add(new_user)
     db.commit()
