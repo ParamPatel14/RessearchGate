@@ -14,18 +14,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Academic Research Matching Platform")
 
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Loading settings...")
-    if not settings.SECRET_KEY:
-        logger.error("SECRET_KEY is missing!")
-    else:
-        logger.info(f"SECRET_KEY loaded (len={len(settings.SECRET_KEY)})")
-        
-    if not settings.GOOGLE_CLIENT_ID:
-        logger.error("GOOGLE_CLIENT_ID is missing!")
-    else:
-        logger.info(f"Google Client ID: {settings.GOOGLE_CLIENT_ID[:10]}...")
+
 
 # Add SessionMiddleware with explicit configuration for localhost
 app.add_middleware(

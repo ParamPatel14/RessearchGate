@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Table, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -26,6 +27,8 @@ class User(Base):
     student_profile = relationship("StudentProfile", back_populates="user", uselist=False)
     mentor_profile = relationship("MentorProfile", back_populates="user", uselist=False)
     skills = relationship("Skill", secondary=user_skills, back_populates="users")
+    opportunities = relationship("Opportunity", back_populates="mentor")
+    applications = relationship("Application", back_populates="student")
 
 class StudentProfile(Base):
     __tablename__ = "student_profiles"
@@ -69,3 +72,33 @@ class Skill(Base):
     
     # Relationships
     users = relationship("User", secondary=user_skills, back_populates="skills")
+
+class Opportunity(Base):
+    __tablename__ = "opportunities"
+
+    id = Column(Integer, primary_key=True, index=True)
+    mentor_id = Column(Integer, ForeignKey("users.id"))
+    title = Column(String, index=True)
+    description = Column(Text)
+    type = Column(String) # internship, research_assistant, phd_guidance, collaboration
+    requirements = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    is_open = Column(Boolean, default=True)
+
+    # Relationships
+    mentor = relationship("User", back_populates="opportunities")
+    applications = relationship("Application", back_populates="opportunity")
+
+class Application(Base):
+    __tablename__ = "applications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("users.id"))
+    opportunity_id = Column(Integer, ForeignKey("opportunities.id"))
+    status = Column(String, default="pending") # pending, reviewing, accepted, rejected
+    cover_letter = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    student = relationship("User", back_populates="applications")
+    opportunity = relationship("Opportunity", back_populates="applications")
