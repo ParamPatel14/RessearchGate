@@ -129,4 +129,30 @@ export const updateApplicationStatus = async (id, status) => {
   return response.data;
 };
 
+// Improvement Plan APIs
+export const generateImprovementPlan = async (opportunityId) => {
+  const response = await api.post(`/improvement/generate/${opportunityId}`);
+  return response.data;
+};
+
+export const getMyImprovementPlans = async () => {
+  const response = await api.get("/improvement/");
+  return response.data;
+};
+
+export const getImprovementPlan = async (planId) => {
+  const response = await api.get(`/improvement/${planId}`);
+  return response.data;
+};
+
+export const updatePlanItem = async (itemId, data) => {
+  const response = await api.put(`/improvement/item/${itemId}`, data);
+  return response.data;
+};
+
+export const getMentorImprovementPlans = async (opportunityId) => {
+  const response = await api.get(`/improvement/mentor/${opportunityId}`);
+  return response.data;
+};
+
 export default api;

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getOpportunities, applyForOpportunity, getMatchPreview } from '../api';
+import { getOpportunities, applyForOpportunity, getMatchPreview, generateImprovementPlan } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 const OpportunityList = () => {
+  const navigate = useNavigate();
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('');
@@ -85,6 +87,18 @@ const OpportunityList = () => {
       setMatchPreview(null);
   }
 
+  const handleImproveChances = async (id) => {
+    if (!window.confirm("Generate an improvement plan for this opportunity? This will analyze your gaps and create tasks.")) return;
+    
+    try {
+        await generateImprovementPlan(id);
+        navigate('/improvement-plans');
+    } catch (err) {
+        console.error(err);
+        alert(err.response?.data?.detail || "Failed to generate improvement plan");
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto mt-8">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Browse Opportunities</h2>
@@ -142,6 +156,12 @@ const OpportunityList = () => {
                             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-sm"
                         >
                             Check Match
+                        </button>
+                        <button
+                            onClick={() => handleImproveChances(opp.id)}
+                            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition text-sm"
+                        >
+                            Improve My Chances
                         </button>
                         </>
                     ) : (
