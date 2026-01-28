@@ -57,35 +57,80 @@ def calculate_match_score(student_user: User, opportunity: Opportunity):
 def calculate_readiness_score(student_profile: StudentProfile, user_skills: list):
     """
     Calculates a global readiness score for a student based on profile completeness and skills.
+    Updated to support both legacy fields and new structured data arrays.
     """
     if not student_profile:
         return 0.0
         
     score = 0
     
-    # Profile Completeness (Total 60)
-    if student_profile.university and student_profile.degree and student_profile.major:
+    # 1. Education (Max 30)
+    has_education = False
+    # Check new array relationship
+    if student_profile.educations and len(student_profile.educations) > 0:
+        has_education = True
+    # Check legacy fields
+    elif student_profile.university and student_profile.degree:
+        has_education = True
+        
+    if has_education:
         score += 30
     
-    if student_profile.bio and len(student_profile.bio) > 50:
+    # 2. Profile Basics (Max 20)
+    # Bio/Headline
+    if (student_profile.bio and len(student_profile.bio) > 20) or (student_profile.headline and len(student_profile.headline) > 5):
         score += 10
         
-    if student_profile.github_url:
+    # Links (GitHub/LinkedIn/Resume/Website)
+    links_count = 0
+    if student_profile.github_url: links_count += 1
+    if student_profile.linkedin_url: links_count += 1
+    if student_profile.resume_url: links_count += 1
+    if student_profile.website_url: links_count += 1
+    if student_profile.scholar_url: links_count += 1
+    
+    if links_count >= 2:
         score += 10
-        
-    if student_profile.scholar_url or student_profile.website_url:
+    elif links_count >= 1:
         score += 5
         
-    if student_profile.intro_video_url:
-        score += 5
+    # 3. Skills (Max 30)
+    # Check both relational skills and text-based skills
+    skill_points = 0
+    
+    # Relational skills
+    if user_skills and len(user_skills) >= 3:
+        skill_points = 30
+    elif user_skills and len(user_skills) >= 1:
+        skill_points = 15
         
-    # Skills (Total 40)
-    skill_count = len(user_skills)
-    if skill_count >= 5:
-        score += 40
-    elif skill_count >= 3:
-        score += 25
-    elif skill_count >= 1:
-        score += 10
+    # Text-based skills (fallback or additive if relational is missing)
+    if skill_points < 30:
+        text_skills_count = 0
+        if student_profile.primary_skills:
+            text_skills_count += len(student_profile.primary_skills.split(','))
+        if student_profile.tools_libraries:
+            text_skills_count += len(student_profile.tools_libraries.split(','))
+            
+        if text_skills_count >= 5:
+            skill_points = 30
+        elif text_skills_count >= 3:
+            skill_points = max(skill_points, 15)
+            
+    score += skill_points
+    
+    # 4. Experience & Projects (Max 20)
+    has_exp = False
+    if student_profile.work_experiences and len(student_profile.work_experiences) > 0:
+        has_exp = True
+    
+    has_proj = False
+    if student_profile.projects and len(student_profile.projects) > 0:
+        has_proj = True
         
+    if has_exp:
+        score += 20
+    elif has_proj:
+        score += 15 # Projects only gives 15 if no work exp
+    
     return float(min(100, score))

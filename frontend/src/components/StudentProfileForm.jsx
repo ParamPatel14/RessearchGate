@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { updateStudentProfile, addSkills, parseResume, uploadResume } from "../api";
-import { FiBook, FiGithub, FiGlobe, FiVideo, FiUpload, FiCheck, FiFileText, FiX, FiPlus, FiTrash2, FiLinkedin, FiTwitter } from "react-icons/fi";
+import { updateStudentProfile, uploadResume, parseResume } from "../api";
+import { FiBook, FiGithub, FiGlobe, FiVideo, FiUpload, FiCheck, FiFileText, FiX, FiPlus, FiTrash2, FiLinkedin, FiTwitter, FiEdit2 } from "react-icons/fi";
 
 const INTEREST_OPTIONS = [
   "Web Development", "Data Science", "Machine Learning", "Mobile App Dev", 
@@ -14,7 +14,133 @@ const USER_TYPES = [
 
 const GENDER_OPTIONS = ["Female", "Male", "Others"];
 const LANGUAGE_OPTIONS = ["English", "Hindi", "Telugu", "Tamil", "Marathi", "Kannada", "Bengali", "Gujarati"];
-const DEGREE_OPTIONS = ["B.Tech", "BE", "B.Com", "MBA", "B.A", "M.Tech", "MSc", "PhD"];
+
+const StudentProfileView = ({ data, onEdit }) => {
+  return (
+    <div className="bg-white p-8 rounded-xl shadow-md max-w-5xl mx-auto space-y-8">
+      <div className="flex justify-between items-center border-b pb-4">
+        <div>
+            <h2 className="text-3xl font-bold text-gray-800">{data.name}</h2>
+            <p className="text-gray-600 text-lg">{data.headline}</p>
+        </div>
+        <button onClick={onEdit} className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2 transition">
+            <FiEdit2 /> Edit Profile
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Left Column: Info */}
+        <div className="space-y-6">
+            <div className="bg-gray-50 p-6 rounded-lg">
+                <h3 className="font-semibold text-gray-700 mb-4 flex items-center gap-2"><FiFileText /> Personal Details</h3>
+                <ul className="space-y-3 text-sm">
+                    <li><span className="font-medium">Status:</span> {data.current_status}</li>
+                    <li><span className="font-medium">Location:</span> {data.city}, {data.country}</li>
+                    <li><span className="font-medium">Phone:</span> {data.phone_number}</li>
+                    <li><span className="font-medium">Gender:</span> {data.gender}</li>
+                    <li><span className="font-medium">Languages:</span> {data.languages}</li>
+                </ul>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+                <h3 className="font-semibold text-gray-700 mb-4 flex items-center gap-2"><FiGlobe /> Socials</h3>
+                <div className="flex flex-col gap-3">
+                    {data.github_url && <a href={data.github_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-indigo-600 hover:underline"><FiGithub /> GitHub</a>}
+                    {data.linkedin_url && <a href={data.linkedin_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-blue-600 hover:underline"><FiLinkedin /> LinkedIn</a>}
+                    {data.twitter_url && <a href={data.twitter_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-blue-400 hover:underline"><FiTwitter /> Twitter</a>}
+                    {data.website_url && <a href={data.website_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-gray-600 hover:underline"><FiGlobe /> Website</a>}
+                </div>
+            </div>
+
+             <div className="bg-gray-50 p-6 rounded-lg">
+                <h3 className="font-semibold text-gray-700 mb-4 flex items-center gap-2"><FiCheck /> Skills</h3>
+                <div className="mb-4">
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-2">Primary</p>
+                    <div className="flex flex-wrap gap-2">
+                        {data.primary_skills?.split(',').map((s, i) => (
+                            <span key={i} className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-medium">{s.trim()}</span>
+                        ))}
+                    </div>
+                </div>
+                <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-2">Tools</p>
+                    <div className="flex flex-wrap gap-2">
+                        {data.tools_libraries?.split(',').map((s, i) => (
+                            <span key={i} className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-medium">{s.trim()}</span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Right Column: Experience, Education, Projects */}
+        <div className="md:col-span-2 space-y-8">
+            <section>
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><FiBook /> Work Experience</h3>
+                {data.work_experiences?.length > 0 ? (
+                    <div className="space-y-4">
+                        {data.work_experiences.map((exp, i) => (
+                            <div key={i} className="border-l-4 border-indigo-500 pl-4 py-1">
+                                <h4 className="font-bold text-lg">{exp.title}</h4>
+                                <p className="text-indigo-600 font-medium">{exp.company} <span className="text-gray-400 text-sm">| {exp.start_date} - {exp.end_date}</span></p>
+                                <p className="text-gray-600 mt-2 text-sm whitespace-pre-line">{exp.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : <p className="text-gray-400 italic">No work experience added.</p>}
+            </section>
+
+            <section>
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><FiBook /> Projects</h3>
+                {data.projects?.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4">
+                        {data.projects.map((proj, i) => (
+                            <div key={i} className="border p-4 rounded-lg hover:shadow-md transition">
+                                <div className="flex justify-between items-start">
+                                    <h4 className="font-bold text-lg">{proj.title}</h4>
+                                    {proj.url && <a href={proj.url} target="_blank" rel="noreferrer" className="text-indigo-600 text-sm hover:underline">View Project</a>}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1 mb-2 font-mono">{proj.tech_stack}</p>
+                                <p className="text-gray-600 text-sm">{proj.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : <p className="text-gray-400 italic">No projects added.</p>}
+            </section>
+
+            <section>
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><FiBook /> Education</h3>
+                {data.educations?.length > 0 ? (
+                    <div className="space-y-4">
+                        {data.educations.map((edu, i) => (
+                            <div key={i} className="flex justify-between items-center border-b pb-2 last:border-0">
+                                <div>
+                                    <h4 className="font-bold">{edu.institution}</h4>
+                                    <p className="text-gray-600 text-sm">{edu.degree}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-gray-500 text-sm">{edu.start_year} - {edu.end_year}</p>
+                                    <p className="text-indigo-600 text-xs font-medium">Grade: {edu.grade}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : <p className="text-gray-400 italic">No education details added.</p>}
+            </section>
+             
+             {data.resume_url && (
+                <div className="mt-8 pt-6 border-t">
+                    <h3 className="text-lg font-semibold mb-2">Resume</h3>
+                    <a href={data.resume_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-indigo-600 border border-indigo-200 px-4 py-2 rounded hover:bg-indigo-50 transition">
+                        <FiFileText /> View Uploaded CV
+                    </a>
+                </div>
+             )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const StudentProfileForm = ({ user, onUpdate }) => {
   // Core Profile Data
@@ -43,6 +169,7 @@ const StudentProfileForm = ({ user, onUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [isEditing, setIsEditing] = useState(true);
 
   useEffect(() => {
     if (user?.student_profile) {
@@ -70,6 +197,9 @@ const StudentProfileForm = ({ user, onUpdate }) => {
       
       setPrimarySkills(p.primary_skills || "");
       setTools(p.tools_libraries || "");
+
+      // If profile exists (has an ID), default to View mode
+      if (p.id) setIsEditing(false);
     }
   }, [user]);
 
@@ -136,17 +266,16 @@ const StudentProfileForm = ({ user, onUpdate }) => {
         ...prev,
         phone_number: data.phone_number || prev.phone_number,
         headline: data.headline || prev.headline,
-        email: data.email || prev.email, // Note: email is usually on User model, but we can display it
+        email: data.email || prev.email,
         github_url: data.github_url || prev.github_url,
         linkedin_url: data.linkedin_url || prev.linkedin_url,
         behance_url: data.behance_url || prev.behance_url,
         twitter_url: data.twitter_url || prev.twitter_url,
-        // Heuristic: If we found university in education list, use it for main field too
         university: data.educations?.[0]?.institution || prev.university,
         degree: data.educations?.[0]?.degree || prev.degree
       }));
       
-      // Update Lists (Merge or Replace? Let's append for now to avoid losing manual entries)
+      // Update Lists (Merge or Replace? Let's append for now)
       if (data.work_experiences?.length) setWorkExperiences(prev => [...prev, ...data.work_experiences]);
       if (data.educations?.length) setEducations(prev => [...prev, ...data.educations]);
       if (data.projects?.length) setProjects(prev => [...prev, ...data.projects]);
@@ -174,33 +303,55 @@ const StudentProfileForm = ({ user, onUpdate }) => {
     setMessage({ type: "", text: "" });
 
     try {
-      // Prepare Payload
+      // Prepare Payload - sanitize integers
       const payload = {
         ...formData,
+        graduation_year: formData.graduation_year ? parseInt(formData.graduation_year) : null,
+        start_year: formData.start_year ? parseInt(formData.start_year) : null,
         interests: selectedInterests.join(", "),
         languages: selectedLanguages.join(", "),
         primary_skills: primarySkills,
         tools_libraries: tools,
-        work_experiences: workExperiences,
-        educations: educations,
-        projects: projects
+        // Map arrays to remove extra fields like ID if they exist, to avoid strict schema issues
+        // Although Pydantic usually ignores extras, we do this to be clean
+        work_experiences: workExperiences.map(({title, company, start_date, end_date, description, skills_used}) => ({
+            title, company, start_date, end_date, description, skills_used
+        })),
+        educations: educations.map(({institution, degree, start_year, end_year, grade}) => ({
+            institution, degree, start_year, end_year, grade
+        })),
+        projects: projects.map(({title, tech_stack, url, description}) => ({
+            title, tech_stack, url, description
+        }))
       };
       
       await updateStudentProfile(payload);
       
-      // Update user skills separately if needed, or assume backend handles it via primary_skills
-      // Keeping existing addSkills call for backward compatibility if needed
-      // await addSkills(primarySkills.split(",")); 
-      
       setMessage({ type: "success", text: "Profile updated successfully!" });
+      setIsEditing(false); // Switch to View Mode
       if (onUpdate) onUpdate();
     } catch (err) {
         console.error(err);
-      setMessage({ type: "error", text: "Failed to update profile." });
+      setMessage({ type: "error", text: "Failed to update profile. Please check all fields." });
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!isEditing) {
+    // Combine state into a single object for the View component
+    const viewData = {
+        ...formData,
+        work_experiences: workExperiences,
+        educations: educations,
+        projects: projects,
+        primary_skills: primarySkills,
+        tools_libraries: tools,
+        interests: selectedInterests.join(", "),
+        languages: selectedLanguages.join(", ")
+    };
+    return <StudentProfileView data={viewData} onEdit={() => setIsEditing(true)} />;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 rounded-xl shadow-md max-w-5xl mx-auto">
@@ -281,6 +432,10 @@ const StudentProfileForm = ({ user, onUpdate }) => {
             <div className="flex items-center gap-2">
                 <FiLinkedin className="text-xl text-blue-600" />
                 <input type="text" name="linkedin_url" value={formData.linkedin_url} onChange={handleChange} placeholder="LinkedIn URL" className="w-full p-2 border rounded-lg" />
+            </div>
+            <div className="flex items-center gap-2">
+                <FiTwitter className="text-xl text-blue-400" />
+                <input type="text" name="twitter_url" value={formData.twitter_url} onChange={handleChange} placeholder="Twitter URL" className="w-full p-2 border rounded-lg" />
             </div>
             <div className="flex items-center gap-2">
                 <FiGlobe className="text-xl" />

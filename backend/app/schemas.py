@@ -123,6 +123,7 @@ class StudentProfileResponse(StudentProfileBase):
     work_experiences: List[WorkExperienceResponse] = []
     educations: List[EducationResponse] = []
     projects: List[ProjectResponse] = []
+    readiness_score: float = 0.0
     class Config:
         from_attributes = True
 
