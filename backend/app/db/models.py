@@ -97,6 +97,26 @@ class Opportunity(Base):
     improvement_plans = relationship("ImprovementPlan", back_populates="opportunity")
     assignments = relationship("Assignment", back_populates="opportunity")
 
+    # Phase 7: Grants
+    funding_amount = Column(Float, nullable=True)
+    currency = Column(String, default="USD")
+    grant_agency = Column(String, nullable=True)
+
+class Certificate(Base):
+    __tablename__ = "certificates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(String, unique=True, index=True) # Public verification code
+    student_id = Column(Integer, ForeignKey("users.id"))
+    mentor_id = Column(Integer, ForeignKey("users.id"))
+    opportunity_id = Column(Integer, ForeignKey("opportunities.id"))
+    issue_date = Column(DateTime, default=datetime.utcnow)
+    pdf_url = Column(String)
+    
+    student = relationship("User", foreign_keys=[student_id])
+    mentor = relationship("User", foreign_keys=[mentor_id])
+    opportunity = relationship("Opportunity")
+
 class OpportunitySkill(Base):
     __tablename__ = "opportunity_skills"
     
@@ -118,6 +138,9 @@ class Application(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     match_score = Column(Float, default=0.0) # Snapshot of match score at time of application
     match_details = Column(Text) # JSON string explaining the score (strengths, gaps)
+    
+    # Phase 7: Funding
+    funding_status = Column(String, default="pending") # pending, approved, released
 
     # Relationships
     student = relationship("User", back_populates="applications")

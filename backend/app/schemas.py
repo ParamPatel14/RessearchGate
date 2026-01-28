@@ -113,6 +113,10 @@ class OpportunityBase(BaseModel):
     type: str # internship, research_assistant, phd_guidance, collaboration
     requirements: Optional[str] = None
     is_open: Optional[bool] = True
+    # Phase 7: Grants
+    funding_amount: Optional[float] = None
+    currency: Optional[str] = "USD"
+    grant_agency: Optional[str] = None
 
 class OpportunityCreate(OpportunityBase):
     skills: Optional[List[OpportunitySkillBase]] = []
@@ -147,6 +151,7 @@ class ApplicationResponse(ApplicationBase):
     created_at: datetime
     match_score: float = 0.0
     match_details: Optional[str] = None
-    
+    funding_status: str
+
     class Config:
         from_attributes = True
