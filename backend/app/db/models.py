@@ -43,6 +43,13 @@ class StudentProfile(Base):
     scholar_url = Column(String)
     website_url = Column(String)
     intro_video_url = Column(String)
+    
+    # New Profile Fields
+    current_status = Column(String) # college_student, working_professional, etc.
+    start_year = Column(Integer)
+    interests = Column(Text) # Comma separated list of interests
+    resume_url = Column(String)
+    
     readiness_score = Column(Float, default=0.0) # Global readiness score
     
     # Relationships

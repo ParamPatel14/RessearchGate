@@ -40,6 +40,10 @@ class StudentProfileBase(BaseModel):
     scholar_url: Optional[str] = None
     website_url: Optional[str] = None
     intro_video_url: Optional[str] = None
+    current_status: Optional[str] = None
+    start_year: Optional[int] = None
+    interests: Optional[str] = None
+    resume_url: Optional[str] = None
 
 class StudentProfileCreate(StudentProfileBase):
     pass
