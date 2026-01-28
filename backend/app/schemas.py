@@ -20,6 +20,15 @@ class SkillResponse(SkillBase):
     class Config:
         from_attributes = True
 
+class OpportunitySkillBase(BaseModel):
+    skill_id: int
+    weight: int = 1 # 1-5 scale
+
+class OpportunitySkillResponse(OpportunitySkillBase):
+    skill_name: Optional[str] = None # For convenience
+    class Config:
+        from_attributes = True
+
 # --- Student Profile Schemas ---
 class StudentProfileBase(BaseModel):
     university: Optional[str] = None

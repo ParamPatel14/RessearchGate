@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.db.database import get_db
-from app.db.models import Opportunity, User
+from app.db.models import Opportunity, User, OpportunitySkill
 from app.schemas import OpportunityCreate, OpportunityResponse, OpportunityUpdate
 from app.deps import get_current_user
+from app.services.matching import calculate_match_score
 
 router = APIRouter()
 
@@ -17,17 +18,31 @@ def create_opportunity(
     if current_user.role != "mentor":
         raise HTTPException(status_code=403, detail="Only mentors can post opportunities")
     
+    # Extract skills data
+    skills_data = opportunity.skills
+    
+    # Create opportunity (exclude skills from main model init)
+    opportunity_data = opportunity.model_dump(exclude={"skills"})
     new_opportunity = Opportunity(
         mentor_id=current_user.id,
-        title=opportunity.title,
-        description=opportunity.description,
-        type=opportunity.type,
-        requirements=opportunity.requirements,
-        is_open=opportunity.is_open
+        **opportunity_data
     )
     db.add(new_opportunity)
     db.commit()
     db.refresh(new_opportunity)
+    
+    # Add skills
+    if skills_data:
+        for skill_item in skills_data:
+            opp_skill = OpportunitySkill(
+                opportunity_id=new_opportunity.id,
+                skill_id=skill_item.skill_id,
+                weight=skill_item.weight
+            )
+            db.add(opp_skill)
+        db.commit()
+        db.refresh(new_opportunity)
+        
     return new_opportunity
 
 @router.get("/", response_model=List[OpportunityResponse])
@@ -49,6 +64,26 @@ def read_opportunity(opportunity_id: int, db: Session = Depends(get_db)):
     if not opportunity:
         raise HTTPException(status_code=404, detail="Opportunity not found")
     return opportunity
+
+@router.get("/{opportunity_id}/match-preview")
+def get_match_preview(
+    opportunity_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can view match previews")
+        
+    opportunity = db.query(Opportunity).filter(Opportunity.id == opportunity_id).first()
+    if not opportunity:
+        raise HTTPException(status_code=404, detail="Opportunity not found")
+        
+    score, details = calculate_match_score(current_user, opportunity)
+    
+    return {
+        "match_score": score,
+        "details": details
+    }
 
 @router.put("/{opportunity_id}", response_model=OpportunityResponse)
 def update_opportunity(

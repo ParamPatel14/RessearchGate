@@ -5,10 +5,12 @@ from typing import List, Optional
 from app import deps
 from app.db import models
 from app import schemas
+from app.services.matching import calculate_readiness_score
 
 router = APIRouter()
 
 def calculate_student_completeness(profile: models.StudentProfile, skill_count: int) -> int:
+    # Deprecated in favor of readiness_score, but keeping for backward compatibility if needed
     score = 0
     if profile.university: score += 15
     if profile.degree: score += 15
@@ -55,6 +57,10 @@ def update_student_profile(
     else:
         for field, value in profile_in.dict(exclude_unset=True).items():
             setattr(profile, field, value)
+    
+    # Update readiness score
+    # Note: Skills might not be updated here (usually separate endpoint), but we use current skills
+    profile.readiness_score = calculate_readiness_score(profile, current_user.skills)
     
     db.commit()
     db.refresh(profile)

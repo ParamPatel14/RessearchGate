@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+import json
 from app.db.database import get_db
 from app.db.models import Application, Opportunity, User
 from app.schemas import ApplicationCreate, ApplicationResponse, ApplicationUpdate
 from app.deps import get_current_user
+from app.services.matching import calculate_match_score
 
 router = APIRouter()
 
@@ -32,11 +34,16 @@ def create_application(
     if existing_application:
         raise HTTPException(status_code=400, detail="You have already applied to this opportunity")
 
+    # Calculate match score snapshot
+    score, details = calculate_match_score(current_user, opportunity)
+
     new_application = Application(
         student_id=current_user.id,
         opportunity_id=application.opportunity_id,
         cover_letter=application.cover_letter,
-        status="pending"
+        status="pending",
+        match_score=score,
+        match_details=json.dumps(details)
     )
     db.add(new_application)
     db.commit()
@@ -62,8 +69,8 @@ def read_mentor_applications(
     if current_user.role != "mentor":
         raise HTTPException(status_code=403, detail="Only mentors can view applications for their opportunities")
     
-    # Join Opportunity to filter by mentor_id
-    applications = db.query(Application).join(Opportunity).filter(Opportunity.mentor_id == current_user.id).all()
+    # Join Opportunity to filter by mentor_id and order by match_score descending (Ranked Applicants)
+    applications = db.query(Application).join(Opportunity).filter(Opportunity.mentor_id == current_user.id).order_by(Application.match_score.desc()).all()
     return applications
 
 @router.put("/{application_id}/status", response_model=ApplicationResponse)
