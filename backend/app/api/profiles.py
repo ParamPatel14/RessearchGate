@@ -53,6 +53,12 @@ def update_student_profile(
     profile = current_user.student_profile
     profile_data = profile_in.dict(exclude_unset=True)
     
+    # Optional: Update user's display name if provided
+    name = profile_data.pop("name", None)
+    if name:
+        current_user.name = name
+        db.add(current_user)
+    
     # Handle Nested Relations (Arrays)
     work_ex_data = profile_data.pop("work_experiences", None)
     edu_data = profile_data.pop("educations", None)

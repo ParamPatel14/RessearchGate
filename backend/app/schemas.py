@@ -53,7 +53,6 @@ class StudentProfileBase(BaseModel):
     # Enhanced Fields
     headline: Optional[str] = None
     linkedin_url: Optional[str] = None
-    behance_url: Optional[str] = None
     twitter_url: Optional[str] = None
     primary_skills: Optional[str] = None
     tools_libraries: Optional[str] = None
@@ -116,6 +115,7 @@ class StudentProfileUpdate(StudentProfileBase):
     work_experiences: Optional[List[WorkExperienceCreate]] = []
     educations: Optional[List[EducationCreate]] = []
     projects: Optional[List[ProjectCreate]] = []
+    name: Optional[str] = None
 
 class StudentProfileResponse(StudentProfileBase):
     id: int

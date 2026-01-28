@@ -58,7 +58,6 @@ class StudentProfile(Base):
     # Enhanced Fields for Matching Engine
     headline = Column(String)
     linkedin_url = Column(String)
-    behance_url = Column(String)
     twitter_url = Column(String)
     
     # Skills

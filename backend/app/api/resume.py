@@ -17,10 +17,6 @@ def extract_links(text):
     linkedin = re.search(r'(linkedin\.com/in/[\w-]+)', text, re.IGNORECASE)
     if linkedin: links['linkedin_url'] = "https://" + linkedin.group(1)
     
-    # Behance
-    behance = re.search(r'(behance\.net/[\w-]+)', text, re.IGNORECASE)
-    if behance: links['behance_url'] = "https://" + behance.group(1)
-    
     # Twitter/X
     twitter = re.search(r'(twitter\.com/[\w-]+|x\.com/[\w-]+)', text, re.IGNORECASE)
     if twitter: links['twitter_url'] = "https://" + twitter.group(1)
@@ -36,27 +32,37 @@ def segment_sections(text):
     current_section = "header"
     buffer = []
     
-    # Keywords that start a section
+    # Use STRICT headers to avoid "Technologies used" triggering a skills section.
+    # Must be uppercase or short and distinct.
     keywords = {
-        "experience": ["experience", "work history", "employment"],
-        "education": ["education", "academic background"],
-        "projects": ["projects", "personal projects", "academic projects"],
-        "skills": ["skills", "technical skills", "technologies", "competencies"],
-        "achievements": ["achievements", "awards", "certifications"]
+        "experience": ["WORK EXPERIENCE", "EXPERIENCE", "EMPLOYMENT", "WORK HISTORY"],
+        "education": ["EDUCATION", "ACADEMIC BACKGROUND", "QUALIFICATIONS"],
+        "projects": ["PROJECTS", "PERSONAL PROJECTS", "ACADEMIC PROJECTS"],
+        "skills": ["SKILLS", "TECHNICAL SKILLS", "COMPETENCIES"],
+        "achievements": ["ACHIEVEMENTS", "AWARDS", "CERTIFICATIONS"]
     }
     
     for line in lines:
-        clean_line = line.strip().lower()
+        clean_line = line.strip()
+        # Check for exact match or simple header pattern
+        # e.g. "EDUCATION" or "Education" standing alone or with underline
+        is_header = False
+        upper_line = clean_line.upper()
         
-        # Check if line is a header
-        found_section = None
-        if len(clean_line) < 30: # Headers are usually short
+        # Heuristic: Headers are usually short (< 40 chars)
+        if len(clean_line) < 40 and len(clean_line) > 2:
             for key, triggers in keywords.items():
-                if any(trigger in clean_line for trigger in triggers):
-                    found_section = key
+                # Strict check: line must start with keyword or be equal to keyword
+                # and usually doesn't contain ":" unless it's "Skills:"
+                for trigger in triggers:
+                    if upper_line == trigger or upper_line.startswith(trigger + " ") or upper_line == trigger + ":":
+                        found_section = key
+                        is_header = True
+                        break
+                if is_header:
                     break
         
-        if found_section:
+        if is_header:
             if buffer:
                 sections[current_section] = "\n".join(buffer)
             current_section = found_section
@@ -66,59 +72,69 @@ def segment_sections(text):
             
     if buffer:
         sections[current_section] = "\n".join(buffer)
-        
     return sections
 
 def parse_experience(text):
-    # Heuristic: Split by lines that look like date ranges or job titles
-    # This is very hard to do perfectly without NLP.
-    # We will try to find blocks that start with a date or a company name.
+    entries = []
+    lines = text.split('\n')
+    current_entry = None
     
     # Regex for years: 20xx
     # Regex for dates: Jan 2020, 01/2020, Present
+    date_re = r'((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s?\d{4}|\d{2}/\d{4}|\d{4})'
     
-    entries = []
-    lines = text.split('\n')
-    current_entry = {}
-    
-    # Simple strategy: Every time we see a date range, it's a new entry (or the start of one)
-    date_pattern = r'((19|20)\d{2}|Present|Current)'
-    
-    for line in lines:
-        line = line.strip()
-        if not line: continue
+    for i, raw in enumerate(lines):
+        line = raw.strip()
+        if not line:
+            continue
+            
+        # Check for date in line
+        has_date = re.search(date_re, line, re.IGNORECASE) or 'Present' in line or 'Current' in line
         
-        # If line contains a date range, assume it's a header line for a job
-        if re.search(date_pattern, line):
+        # Looser check for header: Date + (Pipe OR Dash OR just distinct parts)
+        # We assume if a line has a date and looks like a header (short-ish), it's a new entry
+        if has_date and len(line) < 100:
             if current_entry:
                 entries.append(current_entry)
             
-            # Try to extract company/title
-            # Usually: "Software Engineer | Google | 2020 - Present"
-            # Or: "Google 2020-Present"
-            # We'll just dump the line as title/company combined for the user to fix
+            # Extract Company/Role
+            # Strategy: Split by separators
+            parts = re.split(r'[|\–\-]', line)
+            parts = [p.strip() for p in parts if p.strip()]
+            
+            # Usually: "Company | Date" or "Role | Company | Date"
+            # If we have 2 parts: Part 1 is Company/Role, Part 2 has Date
+            company = parts[0] if parts else line
+            
+            # Extract start/end
+            dates = re.findall(date_re, line, re.IGNORECASE)
+            start = dates[0] if dates else ''
+            end = dates[1] if len(dates) > 1 else ('Present' if 'Present' in line or 'Current' in line else '')
+            
             current_entry = {
-                "title": line, # Placeholder
-                "company": "",
-                "start_date": "", 
-                "end_date": "",
+                "title": "", 
+                "company": company, 
+                "start_date": start, 
+                "end_date": end, 
                 "description": ""
             }
             
-            # Extract dates
-            dates = re.findall(r'((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)?\s?20\d{2}|Present)', line, re.IGNORECASE)
-            if dates:
-                current_entry["start_date"] = dates[0]
-                if len(dates) > 1:
-                    current_entry["end_date"] = dates[1]
-                else:
-                    current_entry["end_date"] = "Present"
+            # Look ahead for title if line 1 didn't look like a title
+            # If line 1 was just "Company | Date", line 2 is Title
+            if i + 1 < len(lines):
+                nxt = lines[i + 1].strip()
+                if nxt and not nxt.startswith('•') and not nxt.startswith('-') and len(nxt) < 50:
+                    current_entry["title"] = nxt
         else:
             if current_entry:
-                current_entry["description"] += line + "\n"
+                current_entry["description"] += (('\n' if current_entry["description"] else '') + line)
     
     if current_entry:
         entries.append(current_entry)
+    elif not entries and text.strip():
+        # Fallback: if no date lines found, treat whole block as one entry?
+        # Or try to parse by block spacing. For now, strict date requirement is safer than garbage.
+        pass
         
     return entries
 
@@ -166,35 +182,34 @@ def parse_education(text):
     return entries
 
 def parse_projects(text):
-    # Projects are hard because they don't have standard headers like dates usually.
-    # We'll just split by lines that look like titles (bold/caps?) or bullet points.
-    # For now, just return a raw block or simple line split
     entries = []
     lines = text.split('\n')
     current_entry = None
-    
+    url_re = r'(https?://[^\s]+)'
     for line in lines:
-        line = line.strip()
-        if not line: continue
-        
-        # Assume lines with ":" are titles, e.g. "Chat App: A real-time chat..."
-        if ":" in line and len(line.split(":")[0]) < 30:
+        s = line.strip()
+        if not s:
+            continue
+        if re.match(r'^\d+\.\s', s) or (('|' in s) and ('Project' in s or 'System' in s or 'App' in s)):
             if current_entry:
                 entries.append(current_entry)
-            
-            parts = line.split(":", 1)
-            current_entry = {
-                "title": parts[0].strip(),
-                "description": parts[1].strip(),
-                "tech_stack": "",
-                "url": ""
-            }
-        elif current_entry:
-            current_entry["description"] += "\n" + line
-            
+            title = s
+            title = re.split(r'\|', title)[0].strip()
+            title = re.sub(r'^\d+\.\s*', '', title).strip()
+            current_entry = {"title": title, "description": "", "tech_stack": "", "url": ""}
+        elif s.lower().startswith('technologies used'):
+            tech = s.split(':', 1)[1] if ':' in s else s
+            tech = tech.replace('Technologies used', '').strip()
+            if current_entry:
+                current_entry["tech_stack"] = tech
+        else:
+            if current_entry:
+                m = re.search(url_re, s)
+                if m:
+                    current_entry["url"] = m.group(1)
+                current_entry["description"] += (('\n' if current_entry["description"] else '') + s)
     if current_entry:
         entries.append(current_entry)
-        
     return entries
 
 def parse_skills(text):
@@ -213,6 +228,24 @@ def parse_skills(text):
         "primary": ", ".join(skills_list[:5]),
         "tools": ", ".join(skills_list[5:])
     }
+
+def parse_skills_global(text):
+    # Fallback when there is no explicit "Skills" section
+    # Aggregate all "Technologies used:" lines and any "Skills:" lines
+    tech_lines = []
+    for line in text.split('\n'):
+        s = line.strip()
+        low = s.lower()
+        if low.startswith('technologies used') or low.startswith('skills:') or low.startswith('tech stack'):
+            parts = s.split(':', 1)
+            if len(parts) == 2:
+                tech_lines.append(parts[1].strip())
+    # Combine and split by commas
+    combined = ", ".join(tech_lines)
+    parts = [p.strip() for p in combined.split(',') if p.strip()]
+    primary = ", ".join(parts[:5])
+    tools = ", ".join(parts[5:])
+    return {"primary": primary, "tools": tools}
 
 @router.post("/parse")
 async def parse_resume(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
@@ -257,10 +290,15 @@ async def parse_resume(file: UploadFile = File(...), current_user: User = Depend
         if "projects" in sections:
             data["projects"] = parse_projects(sections["projects"])
             
+        # Skills: prefer explicit section; else fallback to global scan
+        skills_data = None
         if "skills" in sections:
             skills_data = parse_skills(sections["skills"])
-            data["primary_skills"] = skills_data["primary"]
-            data["tools_libraries"] = skills_data["tools"]
+        else:
+            skills_data = parse_skills_global(text)
+        if skills_data:
+            data["primary_skills"] = skills_data.get("primary", "")
+            data["tools_libraries"] = skills_data.get("tools", "")
             
         return {
             "extracted_data": data,

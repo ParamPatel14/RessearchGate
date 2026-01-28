@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { updateStudentProfile, addSkills, parseResume, uploadResume } from "../api";
 import { FiBook, FiGithub, FiGlobe, FiVideo, FiUpload, FiCheck, FiFileText, FiX, FiPlus, FiTrash2, FiLinkedin, FiTwitter } from "react-icons/fi";
-import { FaBehance } from "react-icons/fa";
 
 const INTEREST_OPTIONS = [
   "Web Development", "Data Science", "Machine Learning", "Mobile App Dev", 
@@ -20,10 +19,11 @@ const DEGREE_OPTIONS = ["B.Tech", "BE", "B.Com", "MBA", "B.A", "M.Tech", "MSc", 
 const StudentProfileForm = ({ user, onUpdate }) => {
   // Core Profile Data
   const [formData, setFormData] = useState({
+    name: "",
     university: "", degree: "", major: "", graduation_year: "", start_year: "",
     current_status: "College Student", bio: "",
     github_url: "", scholar_url: "", website_url: "", intro_video_url: "",
-    linkedin_url: "", behance_url: "", twitter_url: "", headline: "",
+    linkedin_url: "", twitter_url: "", headline: "",
     resume_url: "", phone_number: "", city: "", country: "", gender: "",
     interests: "", languages: ""
   });
@@ -48,12 +48,13 @@ const StudentProfileForm = ({ user, onUpdate }) => {
     if (user?.student_profile) {
       const p = user.student_profile;
       setFormData({
+        name: user?.name || "",
         university: p.university || "", degree: p.degree || "", major: p.major || "",
         graduation_year: p.graduation_year || "", start_year: p.start_year || "",
         current_status: p.current_status || "College Student", bio: p.bio || "",
         github_url: p.github_url || "", scholar_url: p.scholar_url || "",
         website_url: p.website_url || "", intro_video_url: p.intro_video_url || "",
-        linkedin_url: p.linkedin_url || "", behance_url: p.behance_url || "",
+        linkedin_url: p.linkedin_url || "",
         twitter_url: p.twitter_url || "", headline: p.headline || "",
         resume_url: p.resume_url || "", phone_number: p.phone_number || "",
         city: p.city || "", country: p.country || "", gender: p.gender || "",
@@ -230,6 +231,10 @@ const StudentProfileForm = ({ user, onUpdate }) => {
         <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2"><FiFileText /> Core Profile</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
+                <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full mt-1 p-2 border rounded-lg" />
+            </div>
+            <div>
                 <label className="block text-sm font-medium text-gray-700">I am a</label>
                 <select name="current_status" value={formData.current_status} onChange={handleChange} className="w-full mt-1 p-2 border rounded-lg">
                     {USER_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
@@ -276,10 +281,6 @@ const StudentProfileForm = ({ user, onUpdate }) => {
             <div className="flex items-center gap-2">
                 <FiLinkedin className="text-xl text-blue-600" />
                 <input type="text" name="linkedin_url" value={formData.linkedin_url} onChange={handleChange} placeholder="LinkedIn URL" className="w-full p-2 border rounded-lg" />
-            </div>
-            <div className="flex items-center gap-2">
-                <FaBehance className="text-xl text-blue-500" />
-                <input type="text" name="behance_url" value={formData.behance_url} onChange={handleChange} placeholder="Behance URL" className="w-full p-2 border rounded-lg" />
             </div>
             <div className="flex items-center gap-2">
                 <FiGlobe className="text-xl" />
