@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Table, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Table, DateTime, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -44,6 +44,7 @@ class StudentProfile(Base):
     scholar_url = Column(String)
     website_url = Column(String)
     intro_video_url = Column(String)
+    readiness_score = Column(Float, default=0.0) # Global readiness score
     
     # Relationships
     user = relationship("User", back_populates="student_profile")
@@ -72,6 +73,7 @@ class Skill(Base):
     
     # Relationships
     users = relationship("User", secondary=user_skills, back_populates="skills")
+    opportunity_links = relationship("OpportunitySkill", back_populates="skill")
 
 class Opportunity(Base):
     __tablename__ = "opportunities"
@@ -88,6 +90,17 @@ class Opportunity(Base):
     # Relationships
     mentor = relationship("User", back_populates="opportunities")
     applications = relationship("Application", back_populates="opportunity")
+    required_skills = relationship("OpportunitySkill", back_populates="opportunity", cascade="all, delete-orphan")
+
+class OpportunitySkill(Base):
+    __tablename__ = "opportunity_skills"
+    
+    opportunity_id = Column(Integer, ForeignKey("opportunities.id"), primary_key=True)
+    skill_id = Column(Integer, ForeignKey("skills.id"), primary_key=True)
+    weight = Column(Integer, default=1) # 1: Nice to have, 3: Important, 5: Critical
+
+    opportunity = relationship("Opportunity", back_populates="required_skills")
+    skill = relationship("Skill", back_populates="opportunity_links")
 
 class Application(Base):
     __tablename__ = "applications"
@@ -98,6 +111,8 @@ class Application(Base):
     status = Column(String, default="pending") # pending, reviewing, accepted, rejected
     cover_letter = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+    match_score = Column(Float, default=0.0) # Snapshot of match score at time of application
+    match_details = Column(Text) # JSON string explaining the score (strengths, gaps)
 
     # Relationships
     student = relationship("User", back_populates="applications")

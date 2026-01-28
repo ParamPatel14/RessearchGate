@@ -106,15 +106,16 @@ class OpportunityBase(BaseModel):
     is_open: Optional[bool] = True
 
 class OpportunityCreate(OpportunityBase):
-    pass
+    skills: Optional[List[OpportunitySkillBase]] = []
 
 class OpportunityUpdate(OpportunityBase):
-    pass
+    skills: Optional[List[OpportunitySkillBase]] = None
 
 class OpportunityResponse(OpportunityBase):
     id: int
     mentor_id: int
     created_at: datetime
+    required_skills: List[OpportunitySkillResponse] = []
     
     class Config:
         from_attributes = True
@@ -135,6 +136,8 @@ class ApplicationResponse(ApplicationBase):
     opportunity_id: int
     status: str
     created_at: datetime
+    match_score: float = 0.0
+    match_details: Optional[str] = None
     
     class Config:
         from_attributes = True
