@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createOpportunity, getSkills } from '../api';
 
-const OpportunityForm = ({ onSuccess }) => {
+const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -84,7 +84,11 @@ const OpportunityForm = ({ onSuccess }) => {
     };
 
     try {
-      await createOpportunity(payload);
+      if (customSubmitFunction) {
+        await customSubmitFunction(payload);
+      } else {
+        await createOpportunity(payload);
+      }
       setSuccess('Opportunity created successfully!');
       setFormData({
         title: '',

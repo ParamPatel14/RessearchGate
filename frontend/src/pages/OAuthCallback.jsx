@@ -11,7 +11,7 @@ const OAuthCallback = () => {
     const token = searchParams.get("token");
     if (token) {
       handleOAuthCallback(token);
-      navigate("/");
+      navigate("/dashboard");
     } else {
       navigate("/login");
     }

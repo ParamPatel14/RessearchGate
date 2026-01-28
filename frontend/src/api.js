@@ -86,6 +86,21 @@ export const verifyMentor = async (userId) => {
   return response.data;
 };
 
+export const getAllStudents = async () => {
+  const response = await api.get("/admin/users/students");
+  return response.data;
+};
+
+export const getAllMentors = async () => {
+  const response = await api.get("/admin/users/mentors");
+  return response.data;
+};
+
+export const createAdminOpportunity = async (data) => {
+  const response = await api.post("/admin/opportunities", data);
+  return response.data;
+};
+
 // Opportunity APIs
 export const createOpportunity = async (data) => {
   const response = await api.post("/opportunities/", data);
