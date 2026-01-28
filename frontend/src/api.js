@@ -98,6 +98,39 @@ export const getOpportunities = async (filters = {}) => {
   return response.data;
 };
 
+// Certificate APIs
+export const generateCertificate = async (data) => {
+  const response = await api.post("/certificates/generate", data);
+  return response.data;
+};
+
+export const verifyCertificate = async (uuid) => {
+  const response = await api.get(`/certificates/${uuid}`);
+  return response.data;
+};
+
+export const getMyCertificates = async () => {
+  const response = await api.get("/certificates/my/certificates");
+  return response.data;
+};
+
+// Analytics APIs
+export const getAnalytics = async () => {
+  const response = await api.get("/analytics/dashboard");
+  return response.data;
+};
+
+// Tool APIs
+export const refineText = async (text) => {
+  const response = await api.post("/tools/refine", { text });
+  return response.data;
+};
+
+export const translateText = async (text, targetLang) => {
+  const response = await api.post("/tools/translate", { text, target_language: targetLang });
+  return response.data;
+};
+
 export const getOpportunity = async (id) => {
   const response = await api.get(`/opportunities/${id}`);
   return response.data;

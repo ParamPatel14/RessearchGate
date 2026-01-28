@@ -5,6 +5,9 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import OAuthCallback from "./pages/OAuthCallback";
 import ImprovementPlanBoard from "./components/ImprovementPlanBoard";
+import CertificateVerification from "./components/CertificateVerification";
+import AnalyticsDashboard from "./components/AnalyticsDashboard";
+import LanguageTool from "./components/LanguageTool";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -36,6 +39,26 @@ function App() {
             element={
               <ProtectedRoute>
                 <ImprovementPlanBoard />
+              </ProtectedRoute>
+            }
+          />
+          {/* Phase 7 Routes */}
+          <Route path="/verify-certificate/:uuid" element={<CertificateVerification />} />
+          <Route path="/verify-certificate" element={<CertificateVerification />} />
+          
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <AnalyticsDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tools"
+            element={
+              <ProtectedRoute>
+                <LanguageTool />
               </ProtectedRoute>
             }
           />

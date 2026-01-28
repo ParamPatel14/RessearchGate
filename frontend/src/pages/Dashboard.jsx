@@ -9,6 +9,8 @@ import OpportunityList from "../components/OpportunityList";
 import MentorApplications from "../components/MentorApplications";
 import StudentApplications from "../components/StudentApplications";
 import ResearchLab from "../components/ResearchLab";
+import AnalyticsDashboard from "../components/AnalyticsDashboard";
+import LanguageTool from "../components/LanguageTool";
 import { FiLogOut, FiActivity, FiBook, FiUser, FiPlusCircle, FiList, FiBriefcase } from "react-icons/fi";
 
 const Dashboard = () => {
@@ -86,6 +88,7 @@ const Dashboard = () => {
                   <button onClick={() => setActiveTab('browse')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'browse' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Browse Opportunities</button>
                   <button onClick={() => setActiveTab('applications')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'applications' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>My Applications</button>
                   <button onClick={() => setActiveTab('lab')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'lab' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Research Lab</button>
+                  <button onClick={() => setActiveTab('tools')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'tools' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Tools</button>
                 </div>
               )}
               {displayRole === "mentor" && (
@@ -94,6 +97,8 @@ const Dashboard = () => {
                   <button onClick={() => setActiveTab('post-opp')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'post-opp' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Post Opportunity</button>
                   <button onClick={() => setActiveTab('applications')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'applications' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Manage Applications</button>
                   <button onClick={() => setActiveTab('lab')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'lab' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Research Lab</button>
+                  <button onClick={() => setActiveTab('analytics')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'analytics' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Analytics</button>
+                  <button onClick={() => setActiveTab('tools')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'tools' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Tools</button>
                 </div>
               )}
 
@@ -221,6 +226,8 @@ const Dashboard = () => {
             {activeTab === 'applications' && <StudentApplications />}
             
             {activeTab === 'lab' && <ResearchLab />}
+
+            {activeTab === 'tools' && <LanguageTool />}
           </>
         )}
 
@@ -287,6 +294,9 @@ const Dashboard = () => {
             {activeTab === 'applications' && <MentorApplications />}
 
             {activeTab === 'lab' && <ResearchLab />}
+
+            {activeTab === 'analytics' && <AnalyticsDashboard />}
+            {activeTab === 'tools' && <LanguageTool />}
           </>
         )}
 

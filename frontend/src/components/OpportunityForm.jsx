@@ -7,6 +7,9 @@ const OpportunityForm = ({ onSuccess }) => {
     description: '',
     type: 'internship',
     requirements: '',
+    funding_amount: 0,
+    currency: 'USD',
+    grant_agency: '',
     is_open: true,
   });
   const [error, setError] = useState('');
@@ -88,6 +91,9 @@ const OpportunityForm = ({ onSuccess }) => {
         description: '',
         type: 'internship',
         requirements: '',
+        funding_amount: 0,
+        currency: 'USD',
+        grant_agency: '',
         is_open: true,
       });
       setSelectedSkills([]);
@@ -138,9 +144,53 @@ const OpportunityForm = ({ onSuccess }) => {
             <option value="internship">Internship</option>
             <option value="research_assistant">Research Assistant</option>
             <option value="phd_guidance">PhD Guidance</option>
-            <option value="collaboration">Grant Collaboration</option>
+            <option value="grant">Grant / Collaboration</option>
           </select>
         </div>
+
+        {formData.type === 'grant' && (
+          <div className="bg-blue-50 p-4 rounded-md border border-blue-200">
+            <h3 className="text-md font-semibold text-blue-800 mb-3">Grant Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Funding Amount</label>
+                <input
+                  type="number"
+                  name="funding_amount"
+                  value={formData.funding_amount}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-md"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Currency</label>
+                <select
+                  name="currency"
+                  value={formData.currency}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-md"
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="INR">INR (₹)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Grant Agency</label>
+                <input
+                  type="text"
+                  name="grant_agency"
+                  value={formData.grant_agency}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="e.g. NSF, NIH"
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>

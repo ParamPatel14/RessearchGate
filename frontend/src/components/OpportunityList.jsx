@@ -115,7 +115,7 @@ const OpportunityList = () => {
           <option value="internship">Internship</option>
           <option value="research_assistant">Research Assistant</option>
           <option value="phd_guidance">PhD Guidance</option>
-          <option value="collaboration">Grant Collaboration</option>
+          <option value="grant">Grant / Collaboration</option>
         </select>
       </div>
 
@@ -139,6 +139,17 @@ const OpportunityList = () => {
                       <div className="mt-4">
                         <h4 className="font-semibold text-gray-700">Requirements:</h4>
                         <p className="text-gray-600 text-sm">{opp.requirements}</p>
+                      </div>
+                    )}
+                    
+                    {opp.type === 'grant' && opp.funding_amount > 0 && (
+                      <div className="mt-3 bg-blue-50 p-3 rounded-md border border-blue-100 inline-block">
+                        <p className="text-sm font-semibold text-blue-800">
+                          Grant Funding: {opp.currency} {opp.funding_amount.toLocaleString()}
+                        </p>
+                        {opp.grant_agency && (
+                           <p className="text-xs text-blue-600">Agency: {opp.grant_agency}</p>
+                        )}
                       </div>
                     )}
                   </div>
