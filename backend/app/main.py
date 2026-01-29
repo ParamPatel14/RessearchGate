@@ -17,6 +17,7 @@ from app.api.certificates import router as certificates_router
 from app.api.analytics import router as analytics_router
 from app.api.tools import router as tools_router
 from app.api.resume import router as resume_router
+from app.api.ai import router as ai_router
 from app.core.config import settings
 import logging
 
@@ -61,6 +62,7 @@ app.include_router(certificates_router, prefix="/certificates", tags=["Certifica
 app.include_router(analytics_router, prefix="/analytics", tags=["Analytics"])
 app.include_router(tools_router, prefix="/tools", tags=["Tools"])
 app.include_router(resume_router, prefix="/resume", tags=["Resume"])
+app.include_router(ai_router, prefix="/ai", tags=["AI Features"])
 
 @app.get("/")
 def root():

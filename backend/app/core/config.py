@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str
     GITHUB_CLIENT_ID: str
     GITHUB_CLIENT_SECRET: str
+    GEMINI_API_KEY: str = ""
 
     class Config:
         env_file = ".env"

@@ -302,3 +302,15 @@ export const uploadResume = async (file) => {
 };
 
 export default api;
+
+// AI Features
+export const analyzeMatch = async (opportunityId) => {
+  const response = await api.post('/ai/match-analysis', { opportunity_id: opportunityId });
+  return response.data;
+};
+
+export const generateAICoverLetter = async (opportunityId) => {
+  const response = await api.post('/ai/cover-letter', { opportunity_id: opportunityId });
+  return response.data;
+};
+

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getOpportunities, applyForOpportunity, getMatchPreview, generateImprovementPlan } from '../api';
+import { getOpportunities, applyForOpportunity, getMatchPreview, generateImprovementPlan, analyzeMatch, generateAICoverLetter } from '../api';
 import { useNavigate } from 'react-router-dom';
+import { FiCpu, FiFileText } from 'react-icons/fi'; // Import icons if available, otherwise remove
 
 const OpportunityList = () => {
   const navigate = useNavigate();
@@ -11,10 +12,11 @@ const OpportunityList = () => {
   // Application State
   const [applyingId, setApplyingId] = useState(null);
   const [coverLetter, setCoverLetter] = useState('');
+  const [isGeneratingCoverLetter, setIsGeneratingCoverLetter] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   // Match Preview State
-  const [matchPreview, setMatchPreview] = useState(null); // { score, details }
+  const [matchPreview, setMatchPreview] = useState(null); // { score, missing_skills, explanation }
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState('');
 
@@ -67,19 +69,32 @@ const OpportunityList = () => {
       setMatchPreview(null);
       setPreviewError('');
       setPreviewLoading(true);
-      // Open modal placeholder? Or just set loading state for that item?
-      // Let's use a single modal for simplicity
-      setApplyingId('PREVIEW_' + id); // Hack to reuse modal logic or just distinct ID
+      setApplyingId('PREVIEW_' + id);
 
       try {
-          const data = await getMatchPreview(id);
+          // Use the new AI Match Analysis endpoint
+          const data = await analyzeMatch(id);
           setMatchPreview(data);
       } catch (err) {
           console.error(err);
-          setPreviewError(err.response?.data?.detail || "Failed to get match preview");
+          setPreviewError(err.response?.data?.detail || "Failed to analyze match");
       } finally {
           setPreviewLoading(false);
       }
+  };
+
+  const handleGenerateCoverLetter = async () => {
+    if (!applyingId) return;
+    setIsGeneratingCoverLetter(true);
+    try {
+      const data = await generateAICoverLetter(applyingId);
+      setCoverLetter(data.cover_letter);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.detail || "Failed to generate cover letter");
+    } finally {
+      setIsGeneratingCoverLetter(false);
+    }
   };
   
   const closeMatchModal = () => {
@@ -193,12 +208,31 @@ const OpportunityList = () => {
                       </div>
                     )}
                     <form onSubmit={handleSubmitApplication}>
-                      <label className="block text-gray-700 text-sm font-bold mb-2">Cover Letter</label>
+                      <div className="flex justify-between items-end mb-2">
+                        <label className="block text-gray-700 text-sm font-bold">Cover Letter</label>
+                        <button
+                          type="button"
+                          onClick={handleGenerateCoverLetter}
+                          disabled={isGeneratingCoverLetter}
+                          className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-200 flex items-center gap-1 transition"
+                        >
+                          {isGeneratingCoverLetter ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-indigo-700"></div>
+                              Writing...
+                            </>
+                          ) : (
+                            <>
+                              <FiCpu className="inline" /> Generate with AI
+                            </>
+                          )}
+                        </button>
+                      </div>
                       <textarea
                         value={coverLetter}
                         onChange={(e) => setCoverLetter(e.target.value)}
                         className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-                        rows="4"
+                        rows="6"
                         placeholder="Explain why you are a good fit..."
                         required
                       />
@@ -224,50 +258,49 @@ const OpportunityList = () => {
                 {/* Match Preview Modal (Inline) */}
                 {applyingId === 'PREVIEW_' + opp.id && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white p-6 rounded-lg max-w-lg w-full m-4">
-                            <h3 className="text-xl font-bold mb-4">Match Analysis</h3>
+                        <div className="bg-white p-6 rounded-lg max-w-lg w-full m-4 relative">
+                            <h3 className="text-xl font-bold mb-4">AI Match Analysis</h3>
                             
-                            {previewLoading && <p>Analyzing skills...</p>}
+                            {previewLoading && (
+                                <div className="flex flex-col items-center py-8">
+                                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-2"></div>
+                                    <p className="text-gray-600">Analyzing your profile against requirements...</p>
+                                </div>
+                            )}
                             {previewError && <p className="text-red-500">{previewError}</p>}
                             
-                            {matchPreview && (
+                            {!previewLoading && matchPreview && (
                                 <div>
                                     <div className="flex items-center gap-4 mb-6">
                                         <div className={`text-4xl font-bold ${
-                                            matchPreview.match_score >= 80 ? 'text-green-600' :
-                                            matchPreview.match_score >= 50 ? 'text-yellow-600' : 'text-red-600'
+                                            matchPreview.score >= 80 ? 'text-green-600' :
+                                            matchPreview.score >= 50 ? 'text-yellow-600' : 'text-red-600'
                                         }`}>
-                                            {matchPreview.match_score}%
+                                            {matchPreview.score}%
                                         </div>
-                                        <div className="text-gray-600">Match Score</div>
+                                        <div className="text-gray-600 font-medium">Match Score</div>
                                     </div>
                                     
                                     <div className="space-y-4 max-h-96 overflow-y-auto">
+                                        {/* Explanation */}
+                                        <div className="bg-blue-50 p-4 rounded-lg">
+                                            <h5 className="font-bold text-blue-800 mb-1">Analysis</h5>
+                                            <p className="text-blue-900 text-sm leading-relaxed">{matchPreview.explanation}</p>
+                                        </div>
+
                                         {/* Missing Skills */}
-                                        {matchPreview.details.missing_critical.length > 0 && (
+                                        {matchPreview.missing_skills && matchPreview.missing_skills.length > 0 && (
                                             <div className="bg-red-50 p-3 rounded">
-                                                <h5 className="font-bold text-red-800 mb-1">Missing Critical Skills</h5>
+                                                <h5 className="font-bold text-red-800 mb-1">Missing Skills</h5>
                                                 <ul className="list-disc pl-5 text-red-700">
-                                                    {matchPreview.details.missing_critical.map(s => <li key={s}>{s}</li>)}
-                                                </ul>
-                                            </div>
-                                        )}
-                                        {matchPreview.details.missing_important.length > 0 && (
-                                            <div className="bg-yellow-50 p-3 rounded">
-                                                <h5 className="font-bold text-yellow-800 mb-1">Missing Important Skills</h5>
-                                                <ul className="list-disc pl-5 text-yellow-700">
-                                                    {matchPreview.details.missing_important.map(s => <li key={s}>{s}</li>)}
+                                                    {matchPreview.missing_skills.map((s, i) => <li key={i}>{s}</li>)}
                                                 </ul>
                                             </div>
                                         )}
                                         
-                                        {/* Matched Skills */}
-                                        {matchPreview.details.matched_skills.length > 0 && (
-                                            <div className="bg-green-50 p-3 rounded">
-                                                <h5 className="font-bold text-green-800 mb-1">Matched Skills</h5>
-                                                <ul className="list-disc pl-5 text-green-700">
-                                                    {matchPreview.details.matched_skills.map(s => <li key={s}>{s}</li>)}
-                                                </ul>
+                                        {(!matchPreview.missing_skills || matchPreview.missing_skills.length === 0) && matchPreview.score > 90 && (
+                                            <div className="bg-green-50 p-3 rounded text-green-700">
+                                                Great match! You have all the key skills listed.
                                             </div>
                                         )}
                                     </div>
