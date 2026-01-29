@@ -15,6 +15,12 @@ const USER_TYPES = [
 const GENDER_OPTIONS = ["Female", "Male", "Others"];
 const LANGUAGE_OPTIONS = ["English", "Hindi", "Telugu", "Tamil", "Marathi", "Kannada", "Bengali", "Gujarati"];
 
+const getResumeUrl = (url) => {
+  if (!url) return "#";
+  if (url.startsWith("http")) return url;
+  return `http://localhost:8000/${url}`;
+};
+
 const StudentProfileView = ({ data, onEdit }) => {
   return (
     <div className="bg-white p-8 rounded-xl shadow-md max-w-5xl mx-auto space-y-8">
@@ -131,7 +137,7 @@ const StudentProfileView = ({ data, onEdit }) => {
              {data.resume_url && (
                 <div className="mt-8 pt-6 border-t">
                     <h3 className="text-lg font-semibold mb-2">Resume</h3>
-                    <a href={data.resume_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-indigo-600 border border-indigo-200 px-4 py-2 rounded hover:bg-indigo-50 transition">
+                    <a href={getResumeUrl(data.resume_url)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-indigo-600 border border-indigo-200 px-4 py-2 rounded hover:bg-indigo-50 transition">
                         <FiFileText /> View Uploaded CV
                     </a>
                 </div>
@@ -371,7 +377,7 @@ const StudentProfileForm = ({ user, onUpdate }) => {
             <input type="file" accept=".pdf" className="hidden" onChange={handleResumeAutofill} disabled={isParsing} />
             </label>
             {formData.resume_url && (
-                <a href={formData.resume_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline text-sm">View Uploaded CV</a>
+                <a href={getResumeUrl(formData.resume_url)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline text-sm">View Uploaded CV</a>
             )}
         </div>
         {message.text && <p className={`mt-2 text-sm ${message.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>{message.text}</p>}

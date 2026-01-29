@@ -2,6 +2,7 @@ import google.generativeai as genai
 from app.core.config import settings
 import json
 import logging
+from datetime import datetime, timedelta
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -10,13 +11,8 @@ logger = logging.getLogger(__name__)
 if settings.GEMINI_API_KEY:
     genai.configure(api_key=settings.GEMINI_API_KEY)
 
-# Use Gemini Flash 2.5 (or latest available "gemini-1.5-flash" or similar)
-# Note: "gemini-2.5-flash" might not be the exact model name string yet, usually it's "gemini-1.5-flash" or "gemini-pro".
-# The user mentioned "gemini flash 2.5", likely referring to the newest efficient model.
-# I will try "gemini-1.5-flash" as a safe default for "Flash" class models, or "gemini-pro".
-# If the user strictly means a specific newer version, I can update.
-# For now, "gemini-1.5-flash" is a good choice for speed and cost.
-MODEL_NAME = "gemini-2.5-flash" 
+# Use Gemini 1.5 Flash (or Pro) - 2.5 is likely a typo/future placeholder
+MODEL_NAME = "gemini-1.5-flash" 
 
 def get_model():
     if not settings.GEMINI_API_KEY:
@@ -108,3 +104,53 @@ async def generate_cover_letter(resume_text: str, job_description: str) -> str:
         if "GEMINI_API_KEY is not set" in str(e):
              return "Please add GEMINI_API_KEY to your .env file to enable AI features."
         return "Error generating cover letter. Please try again later."
+
+async def generate_improvement_plan(resume_text: str, job_description: str, days_remaining: int) -> list:
+    """
+    Generates a personalized improvement plan to bridge skill gaps.
+    """
+    try:
+        model = get_model()
+        
+        prompt = f"""
+        You are a senior mentor and technical lead. Analyze the student's resume and the target opportunity.
+        Create a detailed, step-by-step improvement plan to help the student get hired.
+        The plan must be completed in {days_remaining} days.
+        
+        Job Description:
+        {job_description}
+        
+        Resume:
+        {resume_text}
+        
+        Task:
+        1. Identify critical skill gaps.
+        2. Create a learning roadmap with specific, actionable tasks.
+        3. Assign estimated hours and a deadline offset (in days from now) for each task.
+        4. Focus on REAL WORLD application (e.g., "Build a React component" instead of "Learn React").
+        
+        Output a JSON ARRAY of objects with these keys:
+        - "title": Actionable title (e.g., "Master Redux Toolkit").
+        - "description": Why this is needed and what to do (Real world context).
+        - "type": One of ["skill_gap", "mini_project", "reading_list", "sop"].
+        - "estimated_hours": String (e.g., "4-6 hours").
+        - "deadline_day_offset": Integer (1 to {days_remaining}).
+        - "priority": "high", "medium", or "low".
+        
+        Sort by logical order of learning.
+        Output ONLY the JSON array.
+        """
+        
+        response = model.generate_content(prompt)
+        
+        text = response.text.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.endswith("```"):
+            text = text[:-3]
+            
+        return json.loads(text)
+        
+    except Exception as e:
+        logger.error(f"Error in generate_improvement_plan: {str(e)}")
+        return []

@@ -240,6 +240,11 @@ class PlanItem(Base):
     evidence_link = Column(String) # URL to proof (e.g. GitHub, Google Doc)
     created_at = Column(DateTime, default=datetime.utcnow)
     
+    # AI-Enhanced Fields
+    deadline = Column(DateTime, nullable=True)
+    estimated_hours = Column(String, nullable=True) # e.g. "4-6 hours"
+    priority = Column(String, default="medium") # high, medium, low
+    
     # Relationships
     plan = relationship("ImprovementPlan", back_populates="items")
 
