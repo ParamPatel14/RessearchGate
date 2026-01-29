@@ -101,6 +101,11 @@ export const createAdminOpportunity = async (data) => {
   return response.data;
 };
 
+export const getAllApplications = async () => {
+  const response = await api.get("/admin/applications");
+  return response.data;
+};
+
 // Opportunity APIs
 export const createOpportunity = async (data) => {
   const response = await api.post("/opportunities/", data);
@@ -157,8 +162,18 @@ export const getMatchPreview = async (id) => {
 };
 
 // Application APIs
-export const applyForOpportunity = async (data) => {
-  const response = await api.post("/applications/", data);
+export const applyForOpportunity = async (opportunityId, coverLetter, matchScore = null, matchDetails = null) => {
+  const payload = {
+    opportunity_id: opportunityId,
+    cover_letter: coverLetter
+  };
+  
+  if (matchScore !== null) {
+    payload.match_score = matchScore;
+    payload.match_details = JSON.stringify(matchDetails);
+  }
+
+  const response = await api.post("/applications/", payload);
   return response.data;
 };
 

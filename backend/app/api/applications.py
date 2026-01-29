@@ -35,7 +35,11 @@ def create_application(
         raise HTTPException(status_code=400, detail="You have already applied to this opportunity")
 
     # Calculate match score snapshot
-    score, details = calculate_match_score(current_user, opportunity)
+    if application.match_score is not None:
+        score = application.match_score
+        details = json.loads(application.match_details) if application.match_details else {}
+    else:
+        score, details = calculate_match_score(current_user, opportunity)
 
     new_application = Application(
         student_id=current_user.id,

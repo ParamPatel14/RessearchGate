@@ -100,3 +100,12 @@ def create_admin_opportunity(
         
     return db_opportunity
 
+@router.get("/applications", response_model=List[schemas.ApplicationResponse])
+def get_all_applications(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user)
+):
+    check_admin(current_user)
+    applications = db.query(models.Application).all()
+    return applications
+

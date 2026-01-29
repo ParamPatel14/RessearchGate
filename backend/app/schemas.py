@@ -215,6 +215,8 @@ class ApplicationBase(BaseModel):
 
 class ApplicationCreate(ApplicationBase):
     opportunity_id: int
+    match_score: Optional[float] = None
+    match_details: Optional[str] = None
 
 class ApplicationUpdate(BaseModel):
     status: str # pending, reviewing, accepted, rejected
@@ -228,6 +230,9 @@ class ApplicationResponse(ApplicationBase):
     match_score: float = 0.0
     match_details: Optional[str] = None
     funding_status: str
+    
+    student: Optional[UserResponse] = None
+    opportunity: Optional[OpportunityResponse] = None
 
     class Config:
         from_attributes = True

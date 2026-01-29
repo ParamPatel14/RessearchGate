@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from app.api.auth import router as auth_router
+import os
 from app.routes.users import router as users_router
 from app.api.profiles import router as profiles_router
 from app.api.admin import router as admin_router
@@ -27,6 +29,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Academic Research Matching Platform")
 
+# Mount uploads directory for static files (resumes, etc.)
+uploads_dir = os.path.join(os.path.dirname(__file__), "..", "uploads")
+if not os.path.exists(uploads_dir):
+    os.makedirs(uploads_dir)
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
 # Add SessionMiddleware with explicit configuration for localhost

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getPendingMentors, verifyMentor, getAllStudents, getAllMentors, getOpportunities, createAdminOpportunity } from "../api";
-import { FiCheck, FiX, FiShield, FiUsers, FiBriefcase, FiPlus } from "react-icons/fi";
+import { getPendingMentors, verifyMentor, getAllStudents, getAllMentors, getOpportunities, createAdminOpportunity, getAllApplications } from "../api";
+import { FiCheck, FiX, FiShield, FiUsers, FiBriefcase, FiPlus, FiFileText, FiDownload, FiExternalLink } from "react-icons/fi";
 import OpportunityForm from "./OpportunityForm";
 
 const AdminDashboard = () => {
@@ -9,10 +9,13 @@ const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
   const [mentors, setMentors] = useState([]);
   const [opportunities, setOpportunities] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(false);
   
   // Modal State
   const [showOppModal, setShowOppModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -33,6 +36,9 @@ const AdminDashboard = () => {
       } else if (activeTab === 'internships') {
         const data = await getOpportunities(); // Reuse public getOpportunities, admin can see all
         setOpportunities(data);
+      } else if (activeTab === 'applications') {
+        const data = await getAllApplications();
+        setApplications(data);
       }
     } catch (error) {
       console.error(`Failed to fetch ${activeTab} data`, error);
@@ -49,6 +55,17 @@ const AdminDashboard = () => {
       console.error("Failed to verify mentor", error);
       alert("Failed to verify mentor");
     }
+  };
+
+  const handleViewProfile = (student) => {
+    setSelectedStudent(student);
+    setShowProfileModal(true);
+  };
+
+  const getResumeUrl = (url) => {
+    if (!url) return "#";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:8000/${url}`;
   };
 
   return (
@@ -85,6 +102,12 @@ const AdminDashboard = () => {
           className={`px-4 py-2 font-medium rounded-t-lg ${activeTab === 'internships' ? 'bg-indigo-100 text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-600 hover:text-gray-900'}`}
         >
           Internships
+        </button>
+        <button 
+          onClick={() => setActiveTab('applications')} 
+          className={`px-4 py-2 font-medium rounded-t-lg ${activeTab === 'applications' ? 'bg-indigo-100 text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-600 hover:text-gray-900'}`}
+        >
+          Applications
         </button>
       </div>
 
@@ -216,6 +239,84 @@ const AdminDashboard = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* APPLICATIONS TAB */}
+            {activeTab === 'applications' && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opportunity</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Match Score</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {applications.map((app) => (
+                      <tr key={app.id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{app.student?.name || "Unknown Student"}</div>
+                              <div className="text-sm text-gray-500">{app.student?.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{app.opportunity?.title || "Unknown Opportunity"}</div>
+                          <div className="text-xs text-gray-500 capitalize">{app.opportunity?.type?.replace('_', ' ')}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            app.match_score >= 80 ? 'bg-green-100 text-green-800' :
+                            app.match_score >= 50 ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {app.match_score}% Match
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            app.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                            app.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <div className="flex space-x-3">
+                             {app.student?.student_profile?.resume_url && (
+                                <a 
+                                  href={app.student.student_profile.resume_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                                  title="View Resume"
+                                >
+                                  <FiDownload className="mr-1" /> Resume
+                                </a>
+                             )}
+                             <button className="text-gray-600 hover:text-gray-900 flex items-center" title="View Full Profile">
+                               <FiExternalLink className="mr-1" /> Profile
+                             </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {applications.length === 0 && (
+                        <tr>
+                            <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                                No applications found.
+                            </td>
+                        </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             )}
           </>

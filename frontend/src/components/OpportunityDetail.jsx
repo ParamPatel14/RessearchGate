@@ -60,10 +60,12 @@ const OpportunityDetail = () => {
   const handleApplySubmit = async (e) => {
     e.preventDefault();
     try {
-      await applyForOpportunity({
-        opportunity_id: id,
-        cover_letter: coverLetter
-      });
+      // Pass match score if available from preview
+      const score = matchPreview ? matchPreview.score : null;
+      const details = matchPreview ? matchPreview : null;
+      
+      await applyForOpportunity(id, coverLetter, score, details);
+      
       setApplyMessage({ type: 'success', text: 'Application submitted successfully!' });
       setTimeout(() => {
         setShowApplyModal(false);

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.db.database import SessionLocal, engine
 from app.db import models
 from app.db.models import Submission, PlanItem, PublicationProject
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import text
 
@@ -33,21 +33,21 @@ def seed_internships():
         db.query(models.Opportunity).delete()
         db.commit()
 
-        # 2. Find a mentor user to assign these to (or create one)
-        mentor = db.query(models.User).filter(models.User.role == "mentor").first()
-        if not mentor:
-            print("No mentor found. Creating a dummy mentor...")
-            mentor = models.User(
-                email="mentor@example.com",
-                name="Dr. Alan Turing",
-                role="mentor",
-                password_hash="dummy_hash" # Won't be able to login but fine for relationship
+        # 2. Find an ADMIN user to assign these to (or create one)
+        admin_user = db.query(models.User).filter(models.User.role == "admin").first()
+        if not admin_user:
+            print("No admin found. Creating a default admin...")
+            admin_user = models.User(
+                email="admin@example.com",
+                name="Platform Admin",
+                role="admin",
+                password_hash="dummy_hash" # Won't be able to login with this, but valid for FK
             )
-            db.add(mentor)
+            db.add(admin_user)
             db.commit()
-            db.refresh(mentor)
+            db.refresh(admin_user)
         
-        print(f"Assigning opportunities to mentor: {mentor.name} (ID: {mentor.id})")
+        print(f"Assigning opportunities to admin: {admin_user.name} (ID: {admin_user.id})")
 
         # 3. Create Real-World Internships
         internships = [
@@ -57,7 +57,7 @@ def seed_internships():
                 "description": "Join our AI Research Lab to work on cutting-edge computer vision models. You will be responsible for data preprocessing, model training using PyTorch, and evaluating model performance on large-scale datasets. This role is perfect for students looking to publish papers in top-tier conferences.",
                 "requirements": "Strong proficiency in Python and PyTorch/TensorFlow. Experience with Computer Vision libraries (OpenCV). Understanding of CNNs, Transformers, and GANs. Ability to read and implement research papers.",
                 "total_slots": 2,
-                "deadline": datetime.utcnow() + timedelta(days=30),
+                "deadline": datetime.now(timezone.utc) + timedelta(days=30),
                 "is_open": True,
                 "skills": ["Python", "PyTorch", "Machine Learning", "Computer Vision"]
             },
@@ -67,7 +67,7 @@ def seed_internships():
                 "description": "Work on large language models (LLMs) and NLP tasks. You will assist in fine-tuning open-source models (Llama, Mistral) for specific domain applications. The role involves prompt engineering, RAG pipeline development, and optimizing inference latency.",
                 "requirements": "Experience with NLP and Transformers (Hugging Face). Familiarity with vector databases (Pinecone, ChromaDB). Knowledge of LangChain or LlamaIndex. Strong Python skills.",
                 "total_slots": 3,
-                "deadline": datetime.utcnow() + timedelta(days=45),
+                "deadline": datetime.now(timezone.utc) + timedelta(days=45),
                 "is_open": True,
                 "skills": ["Python", "NLP", "Deep Learning", "Transformers"]
             },
@@ -77,7 +77,7 @@ def seed_internships():
                 "description": "Help us build scalable APIs for our high-traffic platform. You will work with FastAPI and PostgreSQL to design database schemas, optimize queries, and implement secure authentication flows. You will also learn about microservices and Docker containerization.",
                 "requirements": "Proficiency in Python (FastAPI/Django/Flask). Experience with SQL (PostgreSQL) and ORMs (SQLAlchemy). Understanding of RESTful APIs and authentication (JWT). Basic knowledge of Docker and Git.",
                 "total_slots": 5,
-                "deadline": datetime.utcnow() + timedelta(days=20),
+                "deadline": datetime.now(timezone.utc) + timedelta(days=20),
                 "is_open": True,
                 "skills": ["Python", "FastAPI", "SQL", "Docker", "REST API"]
             },
@@ -87,7 +87,7 @@ def seed_internships():
                 "description": "Design and build beautiful, responsive user interfaces using React and Tailwind CSS. You will collaborate with designers to implement pixel-perfect screens and ensure a smooth user experience. Experience with state management (Redux/Context API) is a plus.",
                 "requirements": "Strong skills in JavaScript (ES6+) and React. Experience with Tailwind CSS or other styling frameworks. Understanding of responsive design principles. Familiarity with Git and version control.",
                 "total_slots": 4,
-                "deadline": datetime.utcnow() + timedelta(days=25),
+                "deadline": datetime.now(timezone.utc) + timedelta(days=25),
                 "is_open": True,
                 "skills": ["React", "JavaScript", "Tailwind CSS", "HTML/CSS"]
             }
@@ -96,7 +96,7 @@ def seed_internships():
         for data in internships:
             skill_names = data.pop("skills")
             opp = models.Opportunity(
-                mentor_id=mentor.id,
+                mentor_id=admin_user.id,
                 **data
             )
             db.add(opp)
