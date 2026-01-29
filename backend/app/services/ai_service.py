@@ -80,27 +80,31 @@ async def generate_improvement_plan(resume_text: str, job_description: str, days
         model = get_model()
         
         prompt = f"""
-        You are a senior mentor and technical lead. Analyze the student's resume and the target opportunity.
-        Create a detailed, step-by-step improvement plan to be completed in {days_remaining} days.
-        
+        You are a supportive mentor helping a student prepare for an internship. 
+        Analyze the student's resume and the target opportunity.
+        Create a manageable, motivating improvement plan to be completed in {days_remaining} days.
+
         Job Description:
         {job_description}
         
         Resume:
         {resume_text}
         
-        The plan should focus on closing skill gaps and demonstrating readiness.
-        It must be practical, "real-world" focused (e.g., "Build a React component" instead of "Learn React").
+        CRITICAL INSTRUCTIONS:
+        1. Keep it DOABLE: The total workload for the entire plan should be between 20-30 hours maximum.
+        2. Audience: This is for an Intern/Junior role. Avoid complex senior-level architectural tasks.
+        3. Focus: Identify only the top 3-5 most critical skill gaps. Do not overwhelm the student.
+        4. Tone: Encouraging and practical.
+        5. Tasks: specific, small, and "quick wins" (e.g., "Build a simple API endpoint" rather than "Architect a distributed system").
         
         Output a JSON ARRAY of objects with the following keys:
-        - "title": Short, actionable title (e.g., "Master Redux Toolkit").
-        - "description": Detailed instructions on what to do/build.
+        - "title": Short, actionable title (e.g., "Create a simple React Form").
+        - "description": specific instructions on what to do.
         - "type": One of ["skill_gap", "mini_project", "reading_list", "sop"].
-        - "estimated_hours": String (e.g., "4-6 hours").
-        - "deadline_day_offset": Integer (days from now this should be done, between 1 and {days_remaining}).
+        - "estimated_hours": String (keep individual tasks short, e.g. "2-4 hours").
+        - "deadline_day_offset": Integer (days from now, distributed evenly over {days_remaining} days).
         - "priority": One of ["high", "medium", "low"].
         
-        Ensure the plan fits within {days_remaining} days.
         Output ONLY the JSON ARRAY.
         """
         
@@ -152,53 +156,3 @@ async def generate_cover_letter(resume_text: str, job_description: str) -> str:
         if "GEMINI_API_KEY is not set" in str(e):
              return "Please add GEMINI_API_KEY to your .env file to enable AI features."
         return "Error generating cover letter. Please try again later."
-
-async def generate_improvement_plan(resume_text: str, job_description: str, days_remaining: int) -> list:
-    """
-    Generates a personalized improvement plan to bridge skill gaps.
-    """
-    try:
-        model = get_model()
-        
-        prompt = f"""
-        You are a senior mentor and technical lead. Analyze the student's resume and the target opportunity.
-        Create a detailed, step-by-step improvement plan to help the student get hired.
-        The plan must be completed in {days_remaining} days.
-        
-        Job Description:
-        {job_description}
-        
-        Resume:
-        {resume_text}
-        
-        Task:
-        1. Identify critical skill gaps.
-        2. Create a learning roadmap with specific, actionable tasks.
-        3. Assign estimated hours and a deadline offset (in days from now) for each task.
-        4. Focus on REAL WORLD application (e.g., "Build a React component" instead of "Learn React").
-        
-        Output a JSON ARRAY of objects with these keys:
-        - "title": Actionable title (e.g., "Master Redux Toolkit").
-        - "description": Why this is needed and what to do (Real world context).
-        - "type": One of ["skill_gap", "mini_project", "reading_list", "sop"].
-        - "estimated_hours": String (e.g., "4-6 hours").
-        - "deadline_day_offset": Integer (1 to {days_remaining}).
-        - "priority": "high", "medium", or "low".
-        
-        Sort by logical order of learning.
-        Output ONLY the JSON array.
-        """
-        
-        response = model.generate_content(prompt)
-        
-        text = response.text.strip()
-        if text.startswith("```json"):
-            text = text[7:]
-        if text.endswith("```"):
-            text = text[:-3]
-            
-        return json.loads(text)
-        
-    except Exception as e:
-        logger.error(f"Error in generate_improvement_plan: {str(e)}")
-        return []
