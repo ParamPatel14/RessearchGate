@@ -70,6 +70,11 @@ export const getSkills = async (search = "") => {
   return response.data;
 };
 
+export const createSkill = async (name) => {
+  const response = await api.post("/skills/", { name });
+  return response.data;
+};
+
 export const getCompleteness = async () => {
   const response = await api.get("/profiles/me/completeness");
   return response.data;

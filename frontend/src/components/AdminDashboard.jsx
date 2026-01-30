@@ -329,15 +329,18 @@ const AdminDashboard = () => {
 
       {/* Add Internship Modal */}
       {showOppModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-bold">Add New Internship (Admin)</h3>
-              <button onClick={() => setShowOppModal(false)} className="text-gray-500 hover:text-gray-700">
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto m-4 border border-gray-100">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <FiBriefcase className="text-blue-600"/> 
+                Add New Internship
+              </h3>
+              <button onClick={() => setShowOppModal(false)} className="text-gray-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-full">
                 <FiX size={24} />
               </button>
             </div>
-            <div className="p-4">
+            <div className="p-0">
               <OpportunityForm 
                 onSuccess={() => {
                   setShowOppModal(false);
