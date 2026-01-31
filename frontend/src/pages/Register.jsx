@@ -21,6 +21,7 @@ const Register = () => {
       await register(email, password, name, role);
       navigate("/dashboard");
     } catch (err) {
+      console.error(err);
       setError("Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
@@ -118,7 +119,7 @@ const Register = () => {
                   }`}
                 >
                   <FiUser className={role === "mentor" ? "text-indigo-600" : "text-gray-400"} />
-                  <span className="font-medium">Mentor</span>
+                  <span className="font-medium">Mentor / Supervisor</span>
                 </button>
               </div>
             </div>

@@ -15,6 +15,8 @@ const MentorProfileForm = ({ user, onUpdate }) => {
     preferred_backgrounds: "",
     min_expectations: "",
     max_student_requests: 5,
+    mentor_type: "academic_supervisor",
+    company: "",
   });
   const [publications, setPublications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +36,8 @@ const MentorProfileForm = ({ user, onUpdate }) => {
         preferred_backgrounds: user.mentor_profile.preferred_backgrounds || "",
         min_expectations: user.mentor_profile.min_expectations || "",
         max_student_requests: user.mentor_profile.max_student_requests || 5,
+        mentor_type: user.mentor_profile.mentor_type || "academic_supervisor",
+        company: user.mentor_profile.company || "",
       });
       if (user.mentor_profile.publications) {
         setPublications(user.mentor_profile.publications);
@@ -124,40 +128,82 @@ const MentorProfileForm = ({ user, onUpdate }) => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Mentor Type Selection */}
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">I am a...</label>
+            <div className="flex space-x-4">
+                <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, mentor_type: 'academic_supervisor' }))}
+                    className={`flex-1 py-3 px-4 rounded-lg border text-center transition-all ${formData.mentor_type === 'academic_supervisor' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 ring-2 ring-indigo-500 ring-opacity-50' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+                >
+                    <span className="font-semibold block">PhD Supervisor</span>
+                    <span className="text-xs opacity-75">Academic Research</span>
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, mentor_type: 'industry_mentor' }))}
+                    className={`flex-1 py-3 px-4 rounded-lg border text-center transition-all ${formData.mentor_type === 'industry_mentor' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 ring-2 ring-indigo-500 ring-opacity-50' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+                >
+                    <span className="font-semibold block">Mentor</span>
+                    <span className="text-xs opacity-75">Industry & Placements</span>
+                </button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Lab Name</label>
-              <input
-                type="text"
-                name="lab_name"
-                value={formData.lab_name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="AI Research Lab"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">University / Institution</label>
-              <input
-                type="text"
-                name="university"
-                value={formData.university}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="MIT"
-              />
-            </div>
+            {formData.mentor_type === 'academic_supervisor' ? (
+                <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Lab Name</label>
+                      <input
+                        type="text"
+                        name="lab_name"
+                        value={formData.lab_name}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="AI Research Lab"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">University / Institution</label>
+                      <input
+                        type="text"
+                        name="university"
+                        value={formData.university}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="MIT"
+                      />
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Company / Organization</label>
+                      <input
+                        type="text"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="Google, Microsoft, Startup Inc."
+                      />
+                    </div>
+                    <div className="hidden md:block"></div>
+                </>
+            )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{formData.mentor_type === 'academic_supervisor' ? 'Position / Title' : 'Job Title'}</label>
               <input
                 type="text"
                 name="position"
                 value={formData.position}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Associate Professor"
+                placeholder={formData.mentor_type === 'academic_supervisor' ? "Associate Professor" : "Senior Software Engineer"}
               />
             </div>
 
@@ -204,6 +250,7 @@ const MentorProfileForm = ({ user, onUpdate }) => {
           </div>
 
           {/* PhD Supervision Section */}
+          {formData.mentor_type === 'academic_supervisor' && (
           <div className="border-t pt-6 mt-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <FiBriefcase className="mr-2 text-indigo-600" /> PhD Supervision Details
@@ -287,6 +334,7 @@ const MentorProfileForm = ({ user, onUpdate }) => {
               </div>
             </div>
           </div>
+          )}
 
           {/* Publications Section */}
           <div className="border-t pt-6 mt-6">
