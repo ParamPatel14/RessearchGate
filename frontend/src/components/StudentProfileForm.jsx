@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { updateStudentProfile, uploadResume, parseResume } from "../api";
-import { FiBook, FiGithub, FiGlobe, FiVideo, FiUpload, FiCheck, FiFileText, FiX, FiPlus, FiTrash2, FiLinkedin, FiTwitter, FiEdit2 } from "react-icons/fi";
+import { FiBook, FiGithub, FiGlobe, FiVideo, FiUpload, FiCheck, FiFileText, FiX, FiPlus, FiTrash2, FiLinkedin, FiTwitter, FiEdit2, FiType, FiCalendar, FiLink } from "react-icons/fi";
 
 const INTEREST_OPTIONS = [
   "Web Development", "Data Science", "Machine Learning", "Mobile App Dev", 
@@ -23,7 +23,29 @@ const getResumeUrl = (url) => {
 
 const StudentProfileView = ({ data, onEdit }) => {
   return (
-    <div className="bg-white p-8 rounded-xl shadow-md max-w-5xl mx-auto space-y-8">
+    <>
+      {!data.is_phd_seeker && (
+        <div 
+          onClick={onEdit}
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-1 mb-8 shadow-lg cursor-pointer transform hover:-translate-y-1 transition-all duration-300 max-w-5xl mx-auto"
+        >
+          <div className="bg-white rounded-lg p-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+               <div className="bg-purple-100 p-3 rounded-full">
+                  <FiBook className="text-2xl text-purple-600" />
+               </div>
+               <div>
+                  <h3 className="text-lg font-bold text-gray-900">Looking for a PhD Supervisor?</h3>
+                  <p className="text-gray-600">Connect with top professors. Add your research interests and publications.</p>
+               </div>
+            </div>
+            <button className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-semibold hover:bg-purple-200 transition">
+               Get Started &rarr;
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="bg-white p-8 rounded-xl shadow-md max-w-5xl mx-auto space-y-8">
       <div className="flex justify-between items-center border-b pb-4">
         <div>
             <h2 className="text-3xl font-bold text-gray-800">{data.name}</h2>
@@ -187,7 +209,8 @@ const StudentProfileView = ({ data, onEdit }) => {
              )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
@@ -221,7 +244,17 @@ const StudentProfileForm = ({ user, onUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    const handleOpenEdit = () => {
+      setIsEditing(true);
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    window.addEventListener('open-profile-edit', handleOpenEdit);
+    return () => window.removeEventListener('open-profile-edit', handleOpenEdit);
+  }, []);
 
   useEffect(() => {
     if (user?.student_profile) {
@@ -548,48 +581,64 @@ const StudentProfileForm = ({ user, onUpdate }) => {
                             <FiPlus /> Add Paper
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         {publications.map((pub, index) => (
-                            <div key={index} className="bg-white p-4 rounded border border-purple-200 relative">
-                                <button type="button" onClick={() => removePublication(index)} className="absolute top-2 right-2 text-red-400 hover:text-red-600"><FiTrash2 /></button>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
-                                    <input 
-                                        type="text" 
-                                        placeholder="Paper Title" 
-                                        value={pub.title} 
-                                        onChange={(e) => updatePublication(index, 'title', e.target.value)} 
-                                        className="w-full p-2 border rounded"
-                                    />
-                                    <input 
-                                        type="text" 
-                                        placeholder="Journal / Conference Name" 
-                                        value={pub.journal_conference} 
-                                        onChange={(e) => updatePublication(index, 'journal_conference', e.target.value)} 
-                                        className="w-full p-2 border rounded"
-                                    />
+                            <div key={index} className="bg-white p-6 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition-all duration-300 relative group">
+                                <button type="button" onClick={() => removePublication(index)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition bg-gray-50 p-2 rounded-full hover:bg-red-50">
+                                    <FiTrash2 />
+                                </button>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                                    <div className="relative">
+                                        <FiType className="absolute top-3.5 left-3 text-gray-400" />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Paper Title" 
+                                            value={pub.title} 
+                                            onChange={(e) => updatePublication(index, 'title', e.target.value)} 
+                                            className="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                        />
+                                    </div>
+                                    <div className="relative">
+                                        <FiBook className="absolute top-3.5 left-3 text-gray-400" />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Journal / Conference Name" 
+                                            value={pub.journal_conference} 
+                                            onChange={(e) => updatePublication(index, 'journal_conference', e.target.value)} 
+                                            className="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                        />
+                                    </div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
-                                    <input 
-                                        type="text" 
-                                        placeholder="Publication Date (YYYY-MM)" 
-                                        value={pub.publication_date} 
-                                        onChange={(e) => updatePublication(index, 'publication_date', e.target.value)} 
-                                        className="w-full p-2 border rounded"
-                                    />
-                                    <input 
-                                        type="text" 
-                                        placeholder="Link to Paper (URL)" 
-                                        value={pub.url} 
-                                        onChange={(e) => updatePublication(index, 'url', e.target.value)} 
-                                        className="w-full p-2 border rounded"
-                                    />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                                     <div className="relative">
+                                        <FiCalendar className="absolute top-3.5 left-3 text-gray-400" />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Publication Date (YYYY-MM)" 
+                                            value={pub.publication_date} 
+                                            onChange={(e) => updatePublication(index, 'publication_date', e.target.value)} 
+                                            className="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                        />
+                                    </div>
+                                     <div className="relative">
+                                        <FiLink className="absolute top-3.5 left-3 text-gray-400" />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Link to Paper (URL)" 
+                                            value={pub.url} 
+                                            onChange={(e) => updatePublication(index, 'url', e.target.value)} 
+                                            className="w-full pl-10 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                        />
+                                    </div>
                                 </div>
+                                
                                 <textarea 
-                                    placeholder="Abstract / Short Description" 
+                                    placeholder="Abstract / Short Description..." 
                                     value={pub.description} 
                                     onChange={(e) => updatePublication(index, 'description', e.target.value)} 
-                                    className="w-full p-2 border rounded"
-                                    rows={2}
+                                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition h-24 resize-none"
                                 />
                             </div>
                         ))}

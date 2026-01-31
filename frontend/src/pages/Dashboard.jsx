@@ -217,6 +217,32 @@ const Dashboard = () => {
                       <p>Complete your profile to unlock more stats.</p>
                     </div>
                   </div>
+
+                  {/* PhD Matcher CTA */}
+                  {!currentUser?.student_profile?.is_phd_seeker && (
+                    <div 
+                      onClick={() => window.dispatchEvent(new Event('open-profile-edit'))}
+                      className="bg-white p-6 rounded-xl shadow-md cursor-pointer border-2 border-transparent hover:border-purple-500 transition group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="bg-purple-100 p-2 rounded-lg group-hover:bg-purple-600 transition-colors">
+                          <FiBook className="text-purple-600 group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-gray-800 group-hover:text-purple-700">PhD Matcher</h3>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <input 
+                          type="checkbox" 
+                          checked={false} 
+                          readOnly 
+                          className="mt-1 w-5 h-5 text-purple-600 rounded border-gray-300 cursor-pointer pointer-events-none" 
+                        />
+                        <p className="text-sm text-gray-600">
+                          I am looking for a PhD Supervisor. <span className="text-purple-600 font-medium underline">Complete Profile &rarr;</span>
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
