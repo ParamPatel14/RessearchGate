@@ -172,6 +172,14 @@ class MentorProfileBase(BaseModel):
     preferred_backgrounds: Optional[str] = None
     min_expectations: Optional[str] = None
     max_student_requests: Optional[int] = 5
+    
+    lab_size: Optional[int] = None
+    time_commitment: Optional[str] = None
+    application_requirements: Optional[str] = None
+
+    research_methodology: Optional[str] = None
+    mentorship_style: Optional[str] = None
+    alumni_placement: Optional[str] = None
 
 class MentorProfileCreate(MentorProfileBase):
     publications: Optional[List[PublicationCreate]] = []

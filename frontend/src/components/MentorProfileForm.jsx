@@ -17,6 +17,11 @@ const MentorProfileForm = ({ user, onUpdate }) => {
     max_student_requests: 5,
     mentor_type: "academic_supervisor",
     company: "",
+    lab_size: "",
+    time_commitment: "",
+    application_requirements: "",
+    other_background: "",
+    other_expectation: "",
   });
   const [publications, setPublications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +43,11 @@ const MentorProfileForm = ({ user, onUpdate }) => {
         max_student_requests: user.mentor_profile.max_student_requests || 5,
         mentor_type: user.mentor_profile.mentor_type || "academic_supervisor",
         company: user.mentor_profile.company || "",
+        lab_size: user.mentor_profile.lab_size || "",
+        time_commitment: user.mentor_profile.time_commitment || "",
+        application_requirements: user.mentor_profile.application_requirements || "",
+        other_background: "",
+        other_expectation: "",
       });
       if (user.mentor_profile.publications) {
         setPublications(user.mentor_profile.publications);
@@ -72,10 +82,34 @@ const MentorProfileForm = ({ user, onUpdate }) => {
     setMessage({ type: "", text: "" });
 
     try {
+      // Append "Other" values if present
+      let finalBackgrounds = formData.preferred_backgrounds;
+      if (formData.other_background.trim()) {
+        const currentBgs = finalBackgrounds ? finalBackgrounds.split(", ").filter(s => s) : [];
+        if (!currentBgs.includes(formData.other_background.trim())) {
+           finalBackgrounds = [...currentBgs, formData.other_background.trim()].join(", ");
+        }
+      }
+
+      let finalExpectations = formData.min_expectations;
+      if (formData.other_expectation.trim()) {
+         const currentExps = finalExpectations ? finalExpectations.split(", ").filter(s => s) : [];
+         if (!currentExps.includes(formData.other_expectation.trim())) {
+            finalExpectations = [...currentExps, formData.other_expectation.trim()].join(", ");
+         }
+      }
+
       const payload = {
         ...formData,
+        preferred_backgrounds: finalBackgrounds,
+        min_expectations: finalExpectations,
         publications: publications
       };
+      
+      // Remove temporary "other" fields from payload
+      delete payload.other_background;
+      delete payload.other_expectation;
+
       await updateMentorProfile(payload);
       setMessage({ type: "success", text: "Profile updated successfully!" });
       if (onUpdate) onUpdate();
@@ -86,8 +120,17 @@ const MentorProfileForm = ({ user, onUpdate }) => {
     }
   };
 
-  const backgrounds = ["CS", "ECE", "Bio", "Math"];
-  const expectations = ["Programming", "Math", "Writing"];
+  const backgrounds = [
+    "Computer Science", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", 
+    "Chemical Engineering", "Bioengineering", "Physics", "Mathematics", "Statistics", 
+    "Chemistry", "Biology", "Psychology", "Economics", "Data Science", "Medicine/Health"
+  ];
+  
+  const expectations = [
+    "Programming (Python/C++)", "Data Analysis", "Machine Learning", "Deep Learning", 
+    "Statistical Modeling", "Academic Writing", "Literature Review", "Experimental Design", 
+    "Critical Thinking", "Independent Research", "Strong Math Background"
+  ];
 
   const handleCheckboxChange = (field, value) => {
     const current = formData[field] ? formData[field].split(",").map(s => s.trim()).filter(s => s !== "") : [];
@@ -154,6 +197,48 @@ const MentorProfileForm = ({ user, onUpdate }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {formData.mentor_type === 'academic_supervisor' ? (
                 <>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Research Methodology</label>
+                        <select
+                            name="research_methodology"
+                            value={formData.research_methodology}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                        >
+                            <option value="Experimental">Experimental</option>
+                            <option value="Theoretical">Theoretical</option>
+                            <option value="Computational">Computational</option>
+                            <option value="Mixed Methods">Mixed Methods (Exp + Comp)</option>
+                            <option value="Clinical">Clinical Research</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mentorship Style</label>
+                        <select
+                            name="mentorship_style"
+                            value={formData.mentorship_style}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                        >
+                            <option value="Hands-on">Hands-on (Close Supervision)</option>
+                            <option value="Collaborative">Collaborative (Team-based)</option>
+                            <option value="Independent">Independent (Student-led)</option>
+                            <option value="Hands-off">Hands-off (Results-oriented)</option>
+                        </select>
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Alumni Placements (Where do your students go?)</label>
+                        <textarea
+                            name="alumni_placement"
+                            value={formData.alumni_placement}
+                            onChange={handleChange}
+                            placeholder="e.g. 5 Professors at Top 50 Univs, 3 Google Research, 2 Startups..."
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors h-24"
+                        />
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Lab Name</label>
                       <input
@@ -299,39 +384,98 @@ const MentorProfileForm = ({ user, onUpdate }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Backgrounds</label>
-                <div className="flex flex-wrap gap-3">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Preferred Backgrounds</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
                   {backgrounds.map(bg => (
-                    <label key={bg} className="inline-flex items-center">
+                    <label key={bg} className="inline-flex items-center p-2 rounded hover:bg-white transition cursor-pointer">
                       <input
                         type="checkbox"
                         checked={formData.preferred_backgrounds.split(",").map(s => s.trim()).includes(bg)}
                         onChange={() => handleCheckboxChange("preferred_backgrounds", bg)}
-                        className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+                        className="form-checkbox h-4 w-4 text-indigo-600 rounded transition duration-150 ease-in-out border-gray-300 focus:ring-indigo-500"
                       />
-                      <span className="ml-2 text-gray-700">{bg}</span>
+                      <span className="ml-2 text-sm text-gray-700">{bg}</span>
                     </label>
                   ))}
                 </div>
+                <div>
+                   <label className="block text-xs font-medium text-gray-500 mb-1">Other (Specify)</label>
+                   <input
+                        type="text"
+                        name="other_background"
+                        value={formData.other_background}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="e.g. Anthropology, Law..."
+                   />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Expectations</label>
-                <div className="flex flex-wrap gap-3">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Minimum Expectations</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
                   {expectations.map(exp => (
-                    <label key={exp} className="inline-flex items-center">
+                    <label key={exp} className="inline-flex items-center p-2 rounded hover:bg-white transition cursor-pointer">
                       <input
                         type="checkbox"
                         checked={formData.min_expectations.split(",").map(s => s.trim()).includes(exp)}
                         onChange={() => handleCheckboxChange("min_expectations", exp)}
-                        className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+                        className="form-checkbox h-4 w-4 text-indigo-600 rounded transition duration-150 ease-in-out border-gray-300 focus:ring-indigo-500"
                       />
-                      <span className="ml-2 text-gray-700">{exp}</span>
+                      <span className="ml-2 text-sm text-gray-700">{exp}</span>
                     </label>
                   ))}
                 </div>
+                 <div>
+                   <label className="block text-xs font-medium text-gray-500 mb-1">Other (Specify)</label>
+                   <input
+                        type="text"
+                        name="other_expectation"
+                        value={formData.other_expectation}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="e.g. Field Work, Surveys..."
+                   />
+                </div>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Lab Size (Current Students)</label>
+                    <input
+                        type="number"
+                        name="lab_size"
+                        value={formData.lab_size}
+                        onChange={handleChange}
+                        min="0"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="e.g. 5"
+                    />
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Time Commitment</label>
+                    <input
+                        type="text"
+                        name="time_commitment"
+                        value={formData.time_commitment}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="e.g. 20 hrs/week"
+                    />
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Application Requirements</label>
+                    <textarea
+                        name="application_requirements"
+                        value={formData.application_requirements}
+                        onChange={handleChange}
+                        rows="1"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="CV, SOP, Transcripts..."
+                    />
+                </div>
             </div>
           </div>
           )}

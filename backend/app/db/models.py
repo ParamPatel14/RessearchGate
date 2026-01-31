@@ -166,6 +166,16 @@ class MentorProfile(Base):
     min_expectations = Column(Text) # Comma separated: Programming, Math, Writing
     max_student_requests = Column(Integer, default=5)
     
+    # Detailed PhD Info
+    lab_size = Column(Integer)
+    time_commitment = Column(String) # e.g. "20 hrs/week"
+    application_requirements = Column(Text) # Comma separated list of requirements
+    
+    # Advanced PhD Metrics
+    research_methodology = Column(String) # Theoretical, Experimental, Computational
+    mentorship_style = Column(String) # Hands-on, Hands-off, etc.
+    alumni_placement = Column(Text) # Where alumni have gone
+    
     # Relationships
     user = relationship("User", back_populates="mentor_profile")
     publications = relationship("Publication", back_populates="mentor_profile", cascade="all, delete-orphan")
