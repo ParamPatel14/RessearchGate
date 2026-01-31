@@ -63,6 +63,7 @@ def update_student_profile(
     work_ex_data = profile_data.pop("work_experiences", None)
     edu_data = profile_data.pop("educations", None)
     proj_data = profile_data.pop("projects", None)
+    pub_data = profile_data.pop("publications", None)
     
     if not profile:
         profile = models.StudentProfile(user_id=current_user.id, **profile_data)
@@ -86,6 +87,9 @@ def update_student_profile(
         
     if proj_data is not None:
         profile.projects = [models.Project(**item) for item in proj_data]
+        
+    if pub_data is not None:
+        profile.publications = [models.Publication(**item) for item in pub_data]
     
     # Update readiness score
     # Note: Skills might not be updated here (usually separate endpoint), but we use current skills

@@ -57,6 +57,13 @@ class StudentProfileBase(BaseModel):
     primary_skills: Optional[str] = None
     tools_libraries: Optional[str] = None
 
+    # PhD Matcher Fields
+    is_phd_seeker: Optional[bool] = False
+    research_interests: Optional[str] = None
+    gpa: Optional[str] = None
+    gre_score: Optional[str] = None
+    toefl_score: Optional[str] = None
+
 # Nested Schemas
 class WorkExperienceBase(BaseModel):
     title: Optional[str] = None
@@ -106,15 +113,33 @@ class ProjectResponse(ProjectBase):
     class Config:
         from_attributes = True
 
+class PublicationBase(BaseModel):
+    title: Optional[str] = None
+    journal_conference: Optional[str] = None
+    publication_date: Optional[str] = None
+    url: Optional[str] = None
+    description: Optional[str] = None
+
+class PublicationCreate(PublicationBase):
+    pass
+
+class PublicationResponse(PublicationBase):
+    id: int
+    student_profile_id: int
+    class Config:
+        from_attributes = True
+
 class StudentProfileCreate(StudentProfileBase):
     work_experiences: Optional[List[WorkExperienceCreate]] = []
     educations: Optional[List[EducationCreate]] = []
     projects: Optional[List[ProjectCreate]] = []
+    publications: Optional[List[PublicationCreate]] = []
 
 class StudentProfileUpdate(StudentProfileBase):
     work_experiences: Optional[List[WorkExperienceCreate]] = []
     educations: Optional[List[EducationCreate]] = []
     projects: Optional[List[ProjectCreate]] = []
+    publications: Optional[List[PublicationCreate]] = []
     name: Optional[str] = None
 
 class StudentProfileResponse(StudentProfileBase):
@@ -123,6 +148,7 @@ class StudentProfileResponse(StudentProfileBase):
     work_experiences: List[WorkExperienceResponse] = []
     educations: List[EducationResponse] = []
     projects: List[ProjectResponse] = []
+    publications: List[PublicationResponse] = []
     readiness_score: float = 0.0
     class Config:
         from_attributes = True

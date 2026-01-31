@@ -66,11 +66,19 @@ class StudentProfile(Base):
     
     readiness_score = Column(Float, default=0.0) # Global readiness score
     
+    # PhD Matcher Fields
+    is_phd_seeker = Column(Boolean, default=False)
+    research_interests = Column(Text) # Detailed research interests
+    gpa = Column(String) # Overall GPA
+    gre_score = Column(String) # GRE Score
+    toefl_score = Column(String) # TOEFL/IELTS Score
+
     # Relationships
     user = relationship("User", back_populates="student_profile")
     work_experiences = relationship("WorkExperience", back_populates="student_profile", cascade="all, delete-orphan")
     educations = relationship("Education", back_populates="student_profile", cascade="all, delete-orphan")
     projects = relationship("Project", back_populates="student_profile", cascade="all, delete-orphan")
+    publications = relationship("Publication", back_populates="student_profile", cascade="all, delete-orphan")
 
 class WorkExperience(Base):
     __tablename__ = "work_experiences"
@@ -113,6 +121,20 @@ class Project(Base):
     description = Column(Text)
     
     student_profile = relationship("StudentProfile", back_populates="projects")
+
+class Publication(Base):
+    __tablename__ = "publications"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    student_profile_id = Column(Integer, ForeignKey("student_profiles.id"))
+    
+    title = Column(String)
+    journal_conference = Column(String) # Name of journal or conference
+    publication_date = Column(String) # YYYY-MM-DD or YYYY
+    url = Column(String) # Link to paper
+    description = Column(Text) # Abstract or summary
+    
+    student_profile = relationship("StudentProfile", back_populates="publications")
 
 class MentorProfile(Base):
     __tablename__ = "mentor_profiles"
