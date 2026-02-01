@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { updateMentorProfile } from "../api";
 import { 
   FiUser, FiGlobe, FiBook, FiBriefcase, FiPlus, FiTrash2, FiType, 
-  FiCalendar, FiLink, FiEdit2, FiCheckCircle, FiXCircle, FiAward, FiUsers, FiClock
+  FiCalendar, FiLink, FiEdit2, FiCheckCircle, FiXCircle, FiAward, FiUsers, FiClock,
+  FiActivity, FiTrendingUp
 } from "react-icons/fi";
 
 const MentorProfileForm = ({ user, onUpdate }) => {

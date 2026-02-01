@@ -31,11 +31,18 @@ def calculate_mentor_completeness(profile: models.MentorProfile) -> int:
     return min(score, 100)
 
 @router.get("/me", response_model=schemas.UserResponse)
-def read_users_me(current_user: models.User = Depends(deps.get_current_user)):
+def read_users_me(
+    current_user: models.User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db)
+):
     """
     Get current user details with profile information.
     """
-    return current_user
+    # Re-fetch with eager loading for full profile data including trends
+    user = db.query(models.User).options(
+        joinedload(models.User.mentor_profile).joinedload(models.MentorProfile.topic_trends).joinedload(models.MentorTopicTrend.topic)
+    ).filter(models.User.id == current_user.id).first()
+    return user
 
 @router.put("/me/student", response_model=schemas.StudentProfileResponse)
 def update_student_profile(
@@ -174,7 +181,9 @@ def read_profile(
     """
     Public profile view.
     """
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(models.User).options(
+        joinedload(models.User.mentor_profile).joinedload(models.MentorProfile.topic_trends).joinedload(models.MentorTopicTrend.topic)
+    ).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

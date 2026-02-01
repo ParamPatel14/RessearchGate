@@ -192,6 +192,7 @@ class MentorProfileResponse(MentorProfileBase):
     user_id: int
     is_verified: bool
     publications: List[PublicationResponse] = []
+    topic_trends: List[MentorTopicTrendResponse] = []
     class Config:
         from_attributes = True
 

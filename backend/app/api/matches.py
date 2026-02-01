@@ -9,6 +9,11 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
+class TrendInfo(BaseModel):
+    topic: str
+    status: str
+    count: int
+
 class MatchResult(BaseModel):
     mentor_id: int
     mentor_name: str
@@ -21,6 +26,7 @@ class MatchResult(BaseModel):
     explanation: str
     research_areas: Optional[str]
     accepting_students: Optional[str]
+    trends: List[TrendInfo] = []
 
 @router.get("/mentors", response_model=List[MatchResult])
 async def get_mentor_matches(

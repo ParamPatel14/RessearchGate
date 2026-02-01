@@ -32,7 +32,8 @@ def seed_mentors():
                 "preferred_backgrounds": "Computer Science, Software Engineering",
                 "min_expectations": "Strong Data Structures & Algorithms knowledge, Proficiency in C++ or Java"
             },
-            "publications": []
+            "publications": [],
+            "trends": []
         },
         # Industry Mentor 2: Sarah Jenkins (Recruiter/Hiring Manager perspective)
         {
@@ -58,7 +59,8 @@ def seed_mentors():
                 "preferred_backgrounds": "Any Engineering Discipline, Business, Marketing",
                 "min_expectations": "Strong communication skills, Leadership experience, Passion for technology"
             },
-            "publications": []
+            "publications": [],
+            "trends": []
         },
         # PhD Supervisor 1: Dr. Andrew Ng
         {
@@ -103,6 +105,11 @@ def seed_mentors():
                     "url": "https://arxiv.org/abs/1112.6209",
                     "description": "The 'Cat Neuron' paper. We present a framework for large-scale unsupervised learning using a distributed CPU cluster."
                 }
+            ],
+            "trends": [
+                {"topic": "Deep Learning", "status": "Stable", "count": 120, "last_active": 2024},
+                {"topic": "AI in Education", "status": "Rising", "count": 45, "last_active": 2025},
+                {"topic": "Medical Imaging", "status": "Rising", "count": 30, "last_active": 2024}
             ]
         },
         # PhD Supervisor 2: Dr. Fei-Fei Li
@@ -141,6 +148,11 @@ def seed_mentors():
                     "url": "https://ieeexplore.ieee.org/document/5206848",
                     "description": "We offer ImageNet, a large-scale ontology of images built upon the backbone of the WordNet structure."
                 }
+            ],
+            "trends": [
+                {"topic": "Computer Vision", "status": "Stable", "count": 200, "last_active": 2025},
+                {"topic": "Ambient Intelligence", "status": "Rising", "count": 50, "last_active": 2024},
+                {"topic": "Cognitive AI", "status": "Stable", "count": 80, "last_active": 2023}
             ]
         },
         # PhD Supervisor 3: Dr. Yoshua Bengio
@@ -186,6 +198,11 @@ def seed_mentors():
                     "url": "https://papers.nips.cc/paper/5423-generative-adversarial-nets",
                     "description": "We propose a new framework for estimating generative models via an adversarial process."
                 }
+            ],
+            "trends": [
+                {"topic": "Causal Inference", "status": "Rising", "count": 60, "last_active": 2025},
+                {"topic": "Deep Learning", "status": "Stable", "count": 300, "last_active": 2024},
+                {"topic": "AI Safety", "status": "Rising", "count": 25, "last_active": 2025}
             ]
         }
     ]
@@ -234,6 +251,28 @@ def seed_mentors():
             )
             db.add(pub)
             
+        # Handle Trends (Phase 3)
+        if "trends" in data:
+            # Clear existing trends
+            db.query(models.MentorTopicTrend).filter(models.MentorTopicTrend.mentor_id == profile.id).delete()
+            
+            for trend_data in data["trends"]:
+                # Check if topic exists
+                topic = db.query(models.ResearchTopic).filter(models.ResearchTopic.name == trend_data["topic"]).first()
+                if not topic:
+                    topic = models.ResearchTopic(name=trend_data["topic"])
+                    db.add(topic)
+                    db.flush()
+                
+                trend = models.MentorTopicTrend(
+                    mentor_id=profile.id,
+                    topic_id=topic.id,
+                    trend_status=trend_data["status"],
+                    total_count=trend_data["count"],
+                    last_active_year=trend_data["last_active"]
+                )
+                db.add(trend)
+
         db.commit()
         print(f"  - Profile updated for {data['name']}")
 

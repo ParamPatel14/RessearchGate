@@ -228,6 +228,19 @@ class MatchingEngine:
             if final_score > 10: # Minimum threshold to show
                 explanation = cls._generate_explanation(student, mentor, semantic_sim, alignment_score)
                 
+                # Extract trend info for frontend display
+                trends = []
+                if hasattr(mentor, 'topic_trends') and mentor.topic_trends:
+                    # Sort by count desc
+                    sorted_trends = sorted(mentor.topic_trends, key=lambda x: x.total_count, reverse=True)
+                    for t in sorted_trends[:3]: # Top 3
+                        if t.topic:
+                            trends.append({
+                                "topic": t.topic.name,
+                                "status": t.trend_status,
+                                "count": t.total_count
+                            })
+
                 matches.append({
                     "mentor_id": mentor.id,
                     "mentor_name": mentor.user.name if mentor.user else "Unknown",
@@ -239,7 +252,8 @@ class MatchingEngine:
                     "alignment_score": round(alignment_score),
                     "explanation": explanation,
                     "research_areas": mentor.research_areas,
-                    "accepting_students": mentor.accepting_phd_students
+                    "accepting_students": mentor.accepting_phd_students,
+                    "trends": trends
                 })
         
         # Sort by Final Match Score (Desc)

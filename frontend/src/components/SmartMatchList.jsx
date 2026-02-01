@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getSmartMatches } from "../api";
-import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity } from "react-icons/fi";
+import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity, FiTrendingUp, FiMinus } from "react-icons/fi";
 
 const SmartMatchList = () => {
   const [matches, setMatches] = useState([]);
@@ -139,6 +139,28 @@ const SmartMatchList = () => {
                             <span className="text-xs text-gray-400 flex items-center">+{match.research_areas.split(',').length - 3} more</span>
                         )}
                     </div>
+
+                    {/* Research Trends (Phase 3) */}
+                    {match.trends && match.trends.length > 0 && (
+                        <div className="mb-4">
+                            <h4 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2 flex items-center gap-1">
+                                <FiActivity className="text-indigo-500" /> Recent Research Focus
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                                {match.trends.map((trend, idx) => (
+                                    <div key={idx} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border ${
+                                        trend.status === 'Rising' 
+                                            ? 'bg-green-50 text-green-700 border-green-200' 
+                                            : 'bg-blue-50 text-blue-700 border-blue-200'
+                                    }`}>
+                                        {trend.status === 'Rising' ? <FiTrendingUp /> : <FiMinus className="rotate-90" />}
+                                        <span>{trend.topic}</span>
+                                        {trend.status === 'Rising' && <span className="ml-1 text-[10px] bg-green-200 px-1 rounded-full">Rising</span>}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* AI Explanation Box */}
                     <div className="bg-indigo-50/50 rounded-lg p-4 border border-indigo-100 mb-4">
