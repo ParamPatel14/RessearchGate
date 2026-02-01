@@ -154,6 +154,27 @@ class StudentProfileResponse(StudentProfileBase):
     class Config:
         from_attributes = True
 
+# --- Phase 3: Research Intelligence Schemas ---
+class ResearchTopicBase(BaseModel):
+    name: str
+
+class ResearchTopicResponse(ResearchTopicBase):
+    id: int
+    class Config:
+        from_attributes = True
+
+class MentorTopicTrendBase(BaseModel):
+    trend_status: str
+    total_count: int
+    last_active_year: Optional[int] = None
+
+class MentorTopicTrendResponse(MentorTopicTrendBase):
+    id: int
+    topic_id: int
+    topic: Optional[ResearchTopicResponse] = None
+    class Config:
+        from_attributes = True
+
 # --- Mentor Profile Schemas ---
 class MentorProfileBase(BaseModel):
     lab_name: Optional[str] = None

@@ -135,8 +135,33 @@ class Publication(Base):
     url = Column(String) # Link to paper
     description = Column(Text) # Abstract or summary
     
+    # Phase 3 Fields
+    citation_count = Column(Integer, default=0)
+    doi = Column(String, nullable=True)
+    
     student_profile = relationship("StudentProfile", back_populates="publications")
     mentor_profile = relationship("MentorProfile", back_populates="publications")
+
+class ResearchTopic(Base):
+    __tablename__ = "research_topics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+
+    mentor_trends = relationship("MentorTopicTrend", back_populates="topic")
+
+class MentorTopicTrend(Base):
+    __tablename__ = "mentor_topic_trends"
+
+    id = Column(Integer, primary_key=True, index=True)
+    mentor_id = Column(Integer, ForeignKey("mentor_profiles.id"))
+    topic_id = Column(Integer, ForeignKey("research_topics.id"))
+    trend_status = Column(String) # Rising, Stable, Declining
+    total_count = Column(Integer, default=0)
+    last_active_year = Column(Integer)
+
+    mentor = relationship("MentorProfile", back_populates="topic_trends")
+    topic = relationship("ResearchTopic", back_populates="mentor_trends")
 
 class MentorProfile(Base):
     __tablename__ = "mentor_profiles"
