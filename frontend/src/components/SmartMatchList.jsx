@@ -198,14 +198,14 @@ const SmartMatchList = () => {
                 <div className="flex items-center justify-end gap-3 mt-2">
                     <button 
                         onClick={() => toggleGaps(match.mentor_id)}
-                        className={`text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                        className={`text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-all border ${
                             expandedMentorId === match.mentor_id 
-                                ? "bg-indigo-100 text-indigo-700" 
-                                : "text-gray-500 hover:text-indigo-600 hover:bg-indigo-50"
+                                ? "bg-indigo-50 border-indigo-200 text-indigo-700 shadow-inner" 
+                                : "bg-white border-gray-200 text-gray-600 hover:text-indigo-600 hover:border-indigo-300 hover:shadow-sm"
                         }`}
                     >
                         <FiLightbulb className={expandedMentorId === match.mentor_id ? "fill-current" : ""} />
-                        {expandedMentorId === match.mentor_id ? "Hide Gaps" : "Research Gaps"}
+                        {expandedMentorId === match.mentor_id ? "Hide Gaps" : "Discover Gaps"}
                     </button>
                     <button className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2">
                         View Profile
