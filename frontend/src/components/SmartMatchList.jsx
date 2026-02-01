@@ -1,17 +1,26 @@
 import { useState, useEffect } from "react";
-import { getSmartMatches } from "../api";
-import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity, FiTrendingUp, FiMinus } from "react-icons/fi";
+import { getSmartMatches, getProfile } from "../api";
+import ResearchGapList from "./ResearchGapList";
+import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity, FiTrendingUp, FiMinus, FiLightbulb } from "react-icons/fi";
 
 const SmartMatchList = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [studentId, setStudentId] = useState(null);
+  const [expandedMentorId, setExpandedMentorId] = useState(null);
 
   useEffect(() => {
     const fetchMatches = async () => {
       try {
-        const data = await getSmartMatches();
-        setMatches(data);
+        const [matchesData, profileData] = await Promise.all([
+          getSmartMatches(),
+          getProfile()
+        ]);
+        setMatches(matchesData);
+        if (profileData.student_profile) {
+          setStudentId(profileData.student_profile.id);
+        }
       } catch (err) {
         setError("Failed to load smart matches. Please try again.");
       } finally {
@@ -21,6 +30,14 @@ const SmartMatchList = () => {
 
     fetchMatches();
   }, []);
+
+  const toggleGaps = (mentorId) => {
+    if (expandedMentorId === mentorId) {
+      setExpandedMentorId(null);
+    } else {
+      setExpandedMentorId(mentorId);
+    }
+  };
 
   if (loading) {
     return (
@@ -179,6 +196,17 @@ const SmartMatchList = () => {
                 </div>
 
                 <div className="flex items-center justify-end gap-3 mt-2">
+                    <button 
+                        onClick={() => toggleGaps(match.mentor_id)}
+                        className={`text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                            expandedMentorId === match.mentor_id 
+                                ? "bg-indigo-100 text-indigo-700" 
+                                : "text-gray-500 hover:text-indigo-600 hover:bg-indigo-50"
+                        }`}
+                    >
+                        <FiLightbulb className={expandedMentorId === match.mentor_id ? "fill-current" : ""} />
+                        {expandedMentorId === match.mentor_id ? "Hide Gaps" : "Research Gaps"}
+                    </button>
                     <button className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2">
                         View Profile
                     </button>
@@ -188,6 +216,12 @@ const SmartMatchList = () => {
                 </div>
               </div>
             </div>
+            
+            {expandedMentorId === match.mentor_id && studentId && (
+                <div className="border-t border-gray-100 p-6 bg-gray-50/50">
+                    <ResearchGapList mentorId={match.mentor_id} studentId={studentId} />
+                </div>
+            )}
           </div>
         ))}
       </div>
