@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getResearchGaps } from "../api";
+import { FaLightbulb } from "react-icons/fa";
 import { 
-  FiLightbulb, 
   FiBookOpen, 
   FiTrendingUp, 
   FiAlertCircle, 

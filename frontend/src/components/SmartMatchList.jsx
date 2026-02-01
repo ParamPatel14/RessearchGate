@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { getSmartMatches, getProfile } from "../api";
 import ResearchGapList from "./ResearchGapList";
-import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity, FiTrendingUp, FiMinus, FiLightbulb } from "react-icons/fi";
+import { FaLightbulb } from "react-icons/fa";
+import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity, FiTrendingUp, FiMinus } from "react-icons/fi";
 
 const SmartMatchList = () => {
   const [matches, setMatches] = useState([]);
@@ -204,7 +205,7 @@ const SmartMatchList = () => {
                                 : "bg-white border-gray-200 text-gray-600 hover:text-indigo-600 hover:border-indigo-300 hover:shadow-sm"
                         }`}
                     >
-                        <FiLightbulb className={expandedMentorId === match.mentor_id ? "fill-current" : ""} />
+                        <FaLightbulb className={expandedMentorId === match.mentor_id ? "fill-current" : ""} />
                         {expandedMentorId === match.mentor_id ? "Hide Gaps" : "Discover Gaps"}
                     </button>
                     <button className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2">
