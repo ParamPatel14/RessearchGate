@@ -329,6 +329,11 @@ export const analyzeMatch = async (opportunityId) => {
   return response.data;
 };
 
+export const getSmartMatches = async () => {
+  const response = await api.get('/matches/mentors');
+  return response.data;
+};
+
 export const generateAICoverLetter = async (opportunityId) => {
   const response = await api.post('/ai/cover-letter', { opportunity_id: opportunityId });
   return response.data;

@@ -11,7 +11,8 @@ import StudentApplications from "../components/StudentApplications";
 import ResearchLab from "../components/ResearchLab";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import LanguageTool from "../components/LanguageTool";
-import { FiLogOut, FiActivity, FiBook, FiUser, FiPlusCircle, FiList, FiBriefcase } from "react-icons/fi";
+import SmartMatchList from "../components/SmartMatchList";
+import { FiLogOut, FiActivity, FiBook, FiUser, FiPlusCircle, FiList, FiBriefcase, FiCpu } from "react-icons/fi";
 
 const Dashboard = () => {
   const { user, logout, loading: authLoading, refreshUser } = useAuth();
@@ -85,6 +86,9 @@ const Dashboard = () => {
               {displayRole === "student" && (
                 <div className="hidden md:flex space-x-4 mr-8">
                   <button onClick={() => setActiveTab('profile')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'profile' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Profile</button>
+                  <button onClick={() => setActiveTab('smart-match')} className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${activeTab === 'smart-match' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>
+                    <FiCpu className={activeTab === 'smart-match' ? 'text-indigo-600' : 'text-gray-500'} /> Smart Match
+                  </button>
                   <button onClick={() => setActiveTab('browse')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'browse' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Browse Opportunities</button>
                   <button onClick={() => setActiveTab('applications')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'applications' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>My Applications</button>
                   <button onClick={() => setActiveTab('lab')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'lab' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Research Lab</button>
@@ -246,6 +250,8 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
+
+            {activeTab === 'smart-match' && <SmartMatchList />}
 
             {activeTab === 'browse' && <OpportunityList />}
             

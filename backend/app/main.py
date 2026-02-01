@@ -22,6 +22,8 @@ from app.api.resume import router as resume_router
 from app.api.ai import router as ai_router
 from app.api.matches import router as matches_router
 from app.core.config import settings
+import logging
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

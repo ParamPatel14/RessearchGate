@@ -179,6 +179,7 @@ class MentorProfile(Base):
     # Relationships
     user = relationship("User", back_populates="mentor_profile")
     publications = relationship("Publication", back_populates="mentor_profile", cascade="all, delete-orphan")
+    topic_trends = relationship("MentorTopicTrend", back_populates="mentor", cascade="all, delete-orphan")
 
 class Skill(Base):
     __tablename__ = "skills"
