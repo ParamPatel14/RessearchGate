@@ -305,7 +305,7 @@ class ApplicationUpdate(BaseModel):
 class ApplicationResponse(ApplicationBase):
     id: int
     student_id: int
-    opportunity_id: int
+    opportunity_id: Optional[int] = None
     status: str
     created_at: datetime
     match_score: float = 0.0

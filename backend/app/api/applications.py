@@ -93,6 +93,9 @@ def update_application_status(
         raise HTTPException(status_code=404, detail="Application not found")
     
     # Verify the mentor owns the opportunity
+    if not application.opportunity:
+        raise HTTPException(status_code=404, detail="Opportunity associated with this application not found")
+
     if application.opportunity.mentor_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this application")
     

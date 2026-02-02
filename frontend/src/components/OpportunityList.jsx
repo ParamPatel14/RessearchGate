@@ -9,9 +9,12 @@ const OpportunityList = ({ initialFilters = {} }) => {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('');
 
+  // Use JSON.stringify to ensure deep comparison of initialFilters object
+  // preventing infinite loops when a new object reference is passed or generated
   useEffect(() => {
     fetchOpportunities();
-  }, [filterType, initialFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterType, JSON.stringify(initialFilters)]);
 
   const fetchOpportunities = async () => {
     setLoading(true);
