@@ -101,8 +101,7 @@ const Dashboard = () => {
                     { id: 'my-opportunities', label: 'My Opportunities' },
                     { id: 'applications', label: 'Manage Applications' },
                     { id: 'lab', label: 'Research Lab' },
-                    { id: 'analytics', label: 'Analytics' },
-                    { id: 'tools', label: 'Tools' }
+                    { id: 'analytics', label: 'Analytics' }
                   ].map(tab => (
                     <button
                       key={tab.id}
@@ -337,19 +336,8 @@ const Dashboard = () => {
               <OpportunityForm onSuccess={() => setActiveTab('applications')} />
             )}
 
-            {activeTab === 'my-opportunities' && (
-               <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-gray-800">My Opportunities</h2>
-                    <button 
-                      onClick={() => setActiveTab('post-opp')}
-                      className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700"
-                    >
-                      <FiPlusCircle /> Post New
-                    </button>
-                  </div>
-                  <OpportunityList initialFilters={{ mentor_id: currentUser.id }} />
-               </div>
+            {activeTab === 'my-opportunities' && currentUser && (
+              <OpportunityList initialFilters={{ mentor_id: currentUser.id }} />
             )}
 
             {activeTab === 'applications' && <MentorApplications />}
