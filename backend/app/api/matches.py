@@ -7,7 +7,10 @@ from app.deps import get_current_user
 from app.services.matching_engine import MatchingEngine
 from pydantic import BaseModel
 
+from app.core.cache import SimpleCache
+
 router = APIRouter()
+cache = SimpleCache()
 
 class TrendInfo(BaseModel):
     topic: str
@@ -45,10 +48,20 @@ async def get_mentor_matches(
     if not student_profile:
         raise HTTPException(status_code=400, detail="Student profile not found")
         
+    # Check cache first
+    cache_key = f"smart_matches_{current_user.email}"
+    cached_matches = cache.get(cache_key)
+    if cached_matches:
+        return cached_matches[:limit]
+
     # Fetch all mentors
     mentors = db.query(models.MentorProfile).join(models.User).filter(models.User.is_active == True).all()
     
     # Run Matching Engine
     matches = await MatchingEngine.match_student_with_mentors(student_profile, mentors)
+    
+    # Cache the result for 24 hours (86400 seconds)
+    # We cache the Pydantic models (or dicts)
+    cache.set(cache_key, matches, ttl_seconds=86400)
     
     return matches[:limit]

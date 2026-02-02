@@ -340,4 +340,19 @@ export const getProposalGuidance = async (mentorId, gapTitle, gapDescription) =>
   return response.data;
 };
 
+export const saveResearchGap = async (gapData) => {
+  const response = await api.post("/intelligence/saved-gaps", gapData);
+  return response.data;
+};
+
+export const getSavedResearchGaps = async () => {
+  const response = await api.get("/intelligence/saved-gaps");
+  return response.data;
+};
+
+export const deleteSavedResearchGap = async (gapId) => {
+  const response = await api.delete(`/intelligence/saved-gaps/${gapId}`);
+  return response.data;
+};
+
 export default api;
