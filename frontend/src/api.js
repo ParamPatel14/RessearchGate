@@ -145,17 +145,6 @@ export const getAnalytics = async () => {
   return response.data;
 };
 
-// Tool APIs
-export const refineText = async (text) => {
-  const response = await api.post("/tools/refine", { text });
-  return response.data;
-};
-
-export const translateText = async (text, targetLang) => {
-  const response = await api.post("/tools/translate", { text, target_language: targetLang });
-  return response.data;
-};
-
 export const getOpportunity = async (id) => {
   const response = await api.get(`/opportunities/${id}`);
   return response.data;
@@ -321,8 +310,6 @@ export const uploadResume = async (file) => {
   return response.data;
 };
 
-export default api;
-
 // AI Features
 export const analyzeMatch = async (opportunityId) => {
   const response = await api.post('/ai/match-analysis', { opportunity_id: opportunityId });
@@ -344,24 +331,13 @@ export const getResearchGaps = async (mentorId, studentId) => {
   return response.data;
 };
 
- 
- e x p o r t   c o n s t   g e t P r o p o s a l G u i d a n c e   =   a s y n c   ( m e n t o r I d ,   g a p T i t l e ,   g a p D e s c r i p t i o n )   = >   {  
-     c o n s t   r e s p o n s e   =   a w a i t   a p i . p o s t ( " / a i / p r o p o s a l - g u i d a n c e " ,   {  
-         m e n t o r _ i d :   m e n t o r I d ,  
-         g a p _ t i t l e :   g a p T i t l e ,  
-         g a p _ d e s c r i p t i o n :   g a p D e s c r i p t i o n  
-     } ) ;  
-     r e t u r n   r e s p o n s e . d a t a ;  
- } ;  
-  
- / /   R e s e a r c h   G a p s   A P I  
- e x p o r t   c o n s t   g e t R e s e a r c h G a p s   =   a s y n c   ( m e n t o r I d )   = >   {  
-     c o n s t   r e s p o n s e   =   a w a i t   a p i . g e t ( ` / i n t e l l i g e n c e / m e n t o r s / $ { m e n t o r I d } / g a p s ` ) ;  
-     r e t u r n   r e s p o n s e . d a t a ;  
- } ;  
-  
- e x p o r t   c o n s t   g e t S m a r t M a t c h e s   =   a s y n c   ( )   = >   {  
-         c o n s t   r e s p o n s e   =   a w a i t   a p i . g e t ( " / m a t c h e s / m e n t o r s " ) ;  
-         r e t u r n   r e s p o n s e . d a t a ;  
- } ;  
- 
+export const getProposalGuidance = async (mentorId, gapTitle, gapDescription) => {
+  const response = await api.post("/ai/proposal-guidance", {
+    mentor_id: mentorId,
+    gap_title: gapTitle,
+    gap_description: gapDescription
+  });
+  return response.data;
+};
+
+export default api;

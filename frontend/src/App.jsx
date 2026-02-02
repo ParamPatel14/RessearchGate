@@ -85,14 +85,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/tools"
-            element={
-              <ProtectedRoute>
-                <LanguageTool />
-              </ProtectedRoute>
-            }
-          />
         </Routes>
       </Router>
     </AuthProvider>

@@ -10,7 +10,6 @@ import MentorApplications from "../components/MentorApplications";
 import StudentApplications from "../components/StudentApplications";
 import ResearchLab from "../components/ResearchLab";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
-import LanguageTool from "../components/LanguageTool";
 import SmartMatchList from "../components/SmartMatchList";
 import { FiLogOut, FiActivity, FiBook, FiUser, FiPlusCircle, FiList, FiBriefcase, FiCpu } from "react-icons/fi";
 
@@ -92,7 +91,6 @@ const Dashboard = () => {
                   <button onClick={() => setActiveTab('browse')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'browse' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Browse Opportunities</button>
                   <button onClick={() => setActiveTab('applications')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'applications' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>My Applications</button>
                   <button onClick={() => setActiveTab('lab')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'lab' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Research Lab</button>
-                  <button onClick={() => setActiveTab('tools')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'tools' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Tools</button>
                 </div>
               )}
               {displayRole === "mentor" && (
@@ -328,7 +326,6 @@ const Dashboard = () => {
             {activeTab === 'lab' && <ResearchLab />}
 
             {activeTab === 'analytics' && <AnalyticsDashboard title="My Engagement Analytics" />}
-            {activeTab === 'tools' && <LanguageTool />}
           </>
         )}
 
