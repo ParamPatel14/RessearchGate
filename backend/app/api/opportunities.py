@@ -49,11 +49,14 @@ def read_opportunities(
     skip: int = 0,
     limit: int = 100,
     type: Optional[str] = None,
+    mentor_id: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(Opportunity)
     if type:
         query = query.filter(Opportunity.type == type)
+    if mentor_id:
+        query = query.filter(Opportunity.mentor_id == mentor_id)
     opportunities = query.offset(skip).limit(limit).all()
     return opportunities
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getMentorApplications, updateApplicationStatus, getMentorImprovementPlans } from '../api';
+import { FaTimes } from 'react-icons/fa';
+import { FiUser, FiMail, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 const MentorApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -7,6 +9,10 @@ const MentorApplications = () => {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('applications'); // 'applications' or 'plans'
   const [statusUpdating, setStatusUpdating] = useState(null);
+  
+  // Profile Modal State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -18,23 +24,6 @@ const MentorApplications = () => {
       // Parallel fetch could be better but sticking to simple for now
       const appsData = await getMentorApplications();
       setApplications(appsData);
-      
-      // Fetch plans for all opportunities this mentor owns
-      // This is a bit inefficient (N+1), but simple given current API
-      // Ideally backend should provide a unified endpoint or we just fetch when needed
-      // For now, let's just fetch applications first. 
-      // We will fetch plans only when switching tabs or we can fetch a specific endpoint if we created one.
-      // Since we implemented getMentorImprovementPlans(oppId), we need to know the oppIds.
-      // Let's extract unique oppIds from applications to guess active opportunities? 
-      // Or better, just wait until user clicks a "View Plans" button for a specific opportunity?
-      // Actually, the user requirement says "Mentor visibility (read-only)". 
-      // Let's add a "View Improvement Plans" button next to each opportunity or a separate tab.
-      
-      // Let's try to fetch all plans for all opportunities the mentor has. 
-      // We don't have a "get all my plans" endpoint for mentors, only by opportunity.
-      // Let's modify the UI to show a "Improvement Plans" tab that lists plans grouped by opportunity.
-      // For now, let's just stick to Applications view and maybe add a column or a separate section?
-      
     } catch (err) {
       console.error("Failed to fetch data", err);
     } finally {
@@ -42,16 +31,10 @@ const MentorApplications = () => {
     }
   };
   
-  // Helper to fetch plans for a specific opportunity
-  const fetchPlansForOpp = async (oppId) => {
-      try {
-          const data = await getMentorImprovementPlans(oppId);
-          return data;
-      } catch (e) {
-          console.error(e);
-          return [];
-      }
-  }
+  const handleViewProfile = (student) => {
+    setSelectedStudent(student);
+    setShowProfileModal(true);
+  };
 
   const handleStatusChange = async (appId, newStatus) => {
     setStatusUpdating(appId);
@@ -165,15 +148,30 @@ const MentorApplications = () => {
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                     <div className="flex items-center">
-                      <div className="ml-3">
-                        <p className="text-gray-900 whitespace-no-wrap">
-                           Student ID: {app.student_id}
-                        </p>
-                      </div>
+                        <div className="flex-shrink-0 w-10 h-10">
+                             <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500 font-bold">
+                                {app.student?.name ? app.student.name.charAt(0).toUpperCase() : 'S'}
+                             </div>
+                        </div>
+                        <div className="ml-3">
+                            <p className="text-gray-900 whitespace-no-wrap font-semibold">
+                                {app.student?.name || `Student ID: ${app.student_id}`}
+                            </p>
+                            <button 
+                                onClick={() => handleViewProfile(app.student)}
+                                className="text-indigo-600 hover:text-indigo-900 text-xs font-medium"
+                            >
+                                View Profile
+                            </button>
+                        </div>
                     </div>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    <p className="text-gray-900 whitespace-no-wrap">Opp ID: {app.opportunity_id}</p>
+                    <p className="text-gray-900 whitespace-no-wrap">
+                        <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium">
+                            {app.opportunity?.title || `Opp ID: ${app.opportunity_id}`}
+                        </span>
+                    </p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                     <p className="text-gray-900 whitespace-no-wrap truncate max-w-xs" title={app.cover_letter}>
@@ -203,27 +201,30 @@ const MentorApplications = () => {
                             <>
                               <button
                                 onClick={() => handleStatusChange(app.id, 'reviewing')}
-                                className="text-yellow-600 hover:text-yellow-900"
+                                className="text-yellow-600 hover:text-yellow-900 text-xs font-bold border border-yellow-200 px-2 py-1 rounded bg-yellow-50"
                               >
                                 Review
                               </button>
                             </>
                           )}
                           {app.status === 'reviewing' && (
-                            <>
+                            <div className="flex gap-2">
                               <button
                                 onClick={() => handleStatusChange(app.id, 'accepted')}
-                                className="text-green-600 hover:text-green-900"
+                                className="text-green-600 hover:text-green-900 text-xs font-bold border border-green-200 px-2 py-1 rounded bg-green-50"
                               >
-                                Accept
+                                Pass (Accept)
                               </button>
                               <button
                                 onClick={() => handleStatusChange(app.id, 'rejected')}
-                                className="text-red-600 hover:text-red-900"
+                                className="text-red-600 hover:text-red-900 text-xs font-bold border border-red-200 px-2 py-1 rounded bg-red-50"
                               >
-                                Reject
+                                Fail (Reject)
                               </button>
-                            </>
+                            </div>
+                          )}
+                          {(app.status === 'accepted' || app.status === 'rejected') && (
+                              <span className="text-xs text-gray-400">Decision made</span>
                           )}
                         </>
                       )}
@@ -236,6 +237,98 @@ const MentorApplications = () => {
         </div>
       )}
       </>
+      )}
+
+      {/* Profile Modal */}
+      {showProfileModal && selectedStudent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6 border-b pb-4">
+                        <h3 className="text-2xl font-bold text-gray-800">Student Profile</h3>
+                        <button onClick={() => setShowProfileModal(false)} className="text-gray-400 hover:text-gray-600">
+                            <FaTimes size={24} />
+                        </button>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row gap-6">
+                        <div className="md:w-1/3 flex flex-col items-center">
+                            <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-4xl font-bold mb-4">
+                                {selectedStudent.name ? selectedStudent.name.charAt(0).toUpperCase() : 'S'}
+                            </div>
+                            <h4 className="text-xl font-bold text-center">{selectedStudent.name}</h4>
+                            <p className="text-gray-500 text-sm text-center mb-4">{selectedStudent.email}</p>
+                            
+                            {selectedStudent.student_profile && (
+                                <div className="w-full space-y-2 text-sm text-gray-600">
+                                    {selectedStudent.student_profile.university && (
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold">Uni:</span> {selectedStudent.student_profile.university}
+                                        </div>
+                                    )}
+                                    {selectedStudent.student_profile.major && (
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold">Major:</span> {selectedStudent.student_profile.major}
+                                        </div>
+                                    )}
+                                    {selectedStudent.student_profile.gpa && (
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold">GPA:</span> {selectedStudent.student_profile.gpa}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="md:w-2/3 space-y-6">
+                            {selectedStudent.student_profile ? (
+                                <>
+                                    {selectedStudent.student_profile.bio && (
+                                        <div>
+                                            <h5 className="font-bold text-gray-800 mb-2 border-b pb-1">Bio</h5>
+                                            <p className="text-gray-600 text-sm leading-relaxed">{selectedStudent.student_profile.bio}</p>
+                                        </div>
+                                    )}
+                                    
+                                    {selectedStudent.student_profile.primary_skills && (
+                                        <div>
+                                            <h5 className="font-bold text-gray-800 mb-2 border-b pb-1">Skills</h5>
+                                            <div className="flex flex-wrap gap-2">
+                                                {selectedStudent.student_profile.primary_skills.split(',').map((skill, i) => (
+                                                    <span key={i} className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-semibold">
+                                                        {skill.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedStudent.student_profile.research_interests && (
+                                        <div>
+                                            <h5 className="font-bold text-gray-800 mb-2 border-b pb-1">Research Interests</h5>
+                                            <p className="text-gray-600 text-sm">{selectedStudent.student_profile.research_interests}</p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="text-center py-8 text-gray-500 italic">
+                                    No detailed profile information available.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="mt-8 flex justify-end">
+                        <button 
+                            onClick={() => setShowProfileModal(false)}
+                            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
       )}
     </div>
   );

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { getSmartMatches, getProfile } from "../api";
+import { getSmartMatches, getProfile, getOpportunities, applyForOpportunity } from "../api";
 import ResearchGapList from "./ResearchGapList";
 import SavedResearchGapList from "./SavedResearchGapList";
-import { FaLightbulb } from "react-icons/fa";
-import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity, FiTrendingUp, FiMinus, FiBookmark } from "react-icons/fi";
+import { FaLightbulb, FaTimes } from "react-icons/fa";
+import { FiCpu, FiUser, FiBriefcase, FiAward, FiCheckCircle, FiBook, FiArrowRight, FiActivity, FiTrendingUp, FiMinus, FiBookmark, FiSend } from "react-icons/fi";
 
 const SmartMatchList = () => {
   const [matches, setMatches] = useState([]);
@@ -12,6 +12,16 @@ const SmartMatchList = () => {
   const [studentId, setStudentId] = useState(null);
   const [expandedMentorId, setExpandedMentorId] = useState(null);
   const [activeTab, setActiveTab] = useState("matches"); // "matches" or "saved"
+  
+  // Apply Modal State
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [selectedMentor, setSelectedMentor] = useState(null);
+  const [mentorOpportunities, setMentorOpportunities] = useState([]);
+  const [loadingOpportunities, setLoadingOpportunities] = useState(false);
+  const [selectedOpportunityId, setSelectedOpportunityId] = useState(null);
+  const [coverLetter, setCoverLetter] = useState("");
+  const [applying, setApplying] = useState(false);
+  const [applySuccess, setApplySuccess] = useState(false);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -39,6 +49,49 @@ const SmartMatchList = () => {
       setExpandedMentorId(null);
     } else {
       setExpandedMentorId(mentorId);
+    }
+  };
+
+  const handleApplyClick = async (mentor) => {
+    setSelectedMentor(mentor);
+    setShowApplyModal(true);
+    setLoadingOpportunities(true);
+    setMentorOpportunities([]);
+    setSelectedOpportunityId(null);
+    setCoverLetter("");
+    setApplySuccess(false);
+    
+    try {
+      const opportunities = await getOpportunities({ mentor_id: mentor.mentor_id });
+      // Filter only open opportunities
+      const openOpportunities = opportunities.filter(op => op.is_open);
+      setMentorOpportunities(openOpportunities);
+      if (openOpportunities.length > 0) {
+        setSelectedOpportunityId(openOpportunities[0].id);
+      }
+    } catch (err) {
+      console.error("Failed to fetch opportunities", err);
+    } finally {
+      setLoadingOpportunities(false);
+    }
+  };
+
+  const handleSubmitApplication = async (e) => {
+    e.preventDefault();
+    if (!selectedOpportunityId) return;
+    
+    setApplying(true);
+    try {
+      await applyForOpportunity(selectedOpportunityId, coverLetter, selectedMentor.match_score);
+      setApplySuccess(true);
+      setTimeout(() => {
+        setShowApplyModal(false);
+        setApplySuccess(false);
+      }, 2000);
+    } catch (err) {
+      alert("Failed to submit application. You may have already applied.");
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -240,7 +293,10 @@ const SmartMatchList = () => {
                           <button className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2">
                               View Profile
                           </button>
-                          <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors shadow-sm">
+                          <button 
+                            onClick={() => handleApplyClick(match)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors shadow-sm"
+                          >
                               Apply Now <FiArrowRight />
                           </button>
                       </div>
@@ -257,6 +313,105 @@ const SmartMatchList = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* Apply Modal */}
+      {showApplyModal && selectedMentor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-800">Apply to {selectedMentor.mentor_name}</h3>
+                <button onClick={() => setShowApplyModal(false)} className="text-gray-400 hover:text-gray-600">
+                  <FaTimes />
+                </button>
+              </div>
+
+              {loadingOpportunities ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : mentorOpportunities.length === 0 ? (
+                 <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">This mentor has no open opportunities at the moment.</p>
+                    <button onClick={() => setShowApplyModal(false)} className="text-indigo-600 font-bold hover:underline">
+                      Close
+                    </button>
+                 </div>
+              ) : applySuccess ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FiCheckCircle className="text-3xl" />
+                  </div>
+                  <h4 className="text-xl font-bold text-gray-800 mb-2">Application Sent!</h4>
+                  <p className="text-gray-500">Your application has been successfully submitted.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitApplication} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Opportunity</label>
+                    <div className="space-y-3">
+                      {mentorOpportunities.map((op) => (
+                        <div 
+                          key={op.id}
+                          className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                            selectedOpportunityId === op.id 
+                              ? "border-indigo-600 bg-indigo-50 ring-1 ring-indigo-600" 
+                              : "border-gray-200 hover:border-indigo-300"
+                          }`}
+                          onClick={() => setSelectedOpportunityId(op.id)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                              selectedOpportunityId === op.id ? "border-indigo-600" : "border-gray-400"
+                            }`}>
+                              {selectedOpportunityId === op.id && <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>}
+                            </div>
+                            <div>
+                              <p className="font-bold text-gray-800">{op.title}</p>
+                              <p className="text-xs text-gray-500">{op.type.replace('_', ' ')}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Cover Letter</label>
+                    <textarea
+                      required
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
+                      placeholder="Introduce yourself and explain why you're a good fit..."
+                      className="w-full border border-gray-300 rounded-lg p-3 h-32 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    ></textarea>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowApplyModal(false)}
+                      className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={applying || !selectedOpportunityId}
+                      className={`px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg flex items-center gap-2 ${
+                        (applying || !selectedOpportunityId) ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700 shadow-md hover:shadow-lg"
+                      }`}
+                    >
+                      {applying ? "Sending..." : "Submit Application"}
+                      {!applying && <FiSend />}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
