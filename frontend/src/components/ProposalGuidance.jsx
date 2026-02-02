@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getProposalGuidance } from "../api";
 import { FaClipboardCheck, FaComments, FaLightbulb, FaCheckCircle, FaSpinner, FaTimes } from "react-icons/fa";
 
-const ProposalGuidance = ({ mentorId, gap, onClose }) => {
+const ProposalGuidance = ({ mentorId, gap, onClose, mentorName }) => {
   const [loading, setLoading] = useState(true);
   const [guidance, setGuidance] = useState(null);
   const [error, setError] = useState(null);
@@ -37,7 +37,10 @@ const ProposalGuidance = ({ mentorId, gap, onClose }) => {
             <h2 className="text-xl font-bold flex items-center gap-2">
               <FaLightbulb className="text-yellow-300" /> Research Proposal Guidance
             </h2>
-            <p className="text-indigo-100 text-sm mt-1 opacity-90 line-clamp-1">{gap.title}</p>
+            <p className="text-indigo-100 text-sm mt-1 opacity-90">
+                {mentorName && <span className="font-bold bg-white/20 px-2 py-0.5 rounded mr-2">{mentorName}</span>}
+                <span className="line-clamp-1 inline-block align-bottom">{gap.title}</span>
+            </p>
           </div>
           <button 
             onClick={onClose}

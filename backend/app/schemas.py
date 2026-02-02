@@ -286,6 +286,7 @@ class OpportunityResponse(OpportunityBase):
     mentor_id: int
     created_at: datetime
     required_skills: List[OpportunitySkillResponse] = []
+    mentor: Optional[UserResponse] = None
     
     class Config:
         from_attributes = True

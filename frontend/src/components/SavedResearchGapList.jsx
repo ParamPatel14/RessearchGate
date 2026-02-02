@@ -7,9 +7,12 @@ import {
   FiBookOpen, 
   FiAlertCircle, 
   FiUser, 
-  FiBriefcase,
-  FiActivity,
-  FiTrendingUp
+  FiBriefcase, 
+  FiActivity, 
+  FiTrendingUp,
+  FiExternalLink,
+  FiChevronDown,
+  FiChevronUp
 } from "react-icons/fi";
 import { FaRobot } from "react-icons/fa";
 import ProposalGuidance from "./ProposalGuidance";

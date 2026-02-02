@@ -313,7 +313,7 @@ const SmartMatchList = () => {
                   
                   {expandedMentorId === match.mentor_id && studentId && (
                       <div className="border-t border-gray-100 p-6 bg-gray-50/50">
-                          <ResearchGapList mentorId={match.mentor_id} studentId={studentId} />
+                          <ResearchGapList mentorId={match.mentor_id} studentId={studentId} mentorName={match.mentor_name} />
                       </div>
                   )}
                 </div>

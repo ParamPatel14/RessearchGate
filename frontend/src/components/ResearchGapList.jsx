@@ -17,7 +17,7 @@ import {
   FiPlus
 } from "react-icons/fi";
 
-const ResearchGapList = ({ mentorId, studentId }) => {
+const ResearchGapList = ({ mentorId, studentId, mentorName }) => {
   const [gaps, setGaps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -315,6 +315,7 @@ const ResearchGapList = ({ mentorId, studentId }) => {
       {selectedGap && (
         <ProposalGuidance 
             mentorId={mentorId} 
+            mentorName={mentorName}
             gap={selectedGap} 
             onClose={() => setSelectedGap(null)} 
         />

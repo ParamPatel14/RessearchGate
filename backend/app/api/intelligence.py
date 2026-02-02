@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Any, Optional
 from pydantic import BaseModel
+from datetime import datetime
 from app.db.database import get_db
-from app.db.models import User, SavedResearchGap
+from app.db.models import User, SavedResearchGap, MentorProfile
 from app.deps import get_current_user
 from app.services.research_service import ResearchService
 from app.core.cache import SimpleCache
@@ -96,7 +97,25 @@ class SavedGapCreate(BaseModel):
     confidence_score: int
     related_papers: Optional[str] = "[]"
 
-@router.post("/saved-gaps")
+class SavedGapResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    type: str
+    why_gap: Optional[str]
+    reason_student: Optional[str]
+    reason_mentor: Optional[str]
+    feasibility_score: Optional[int]
+    confidence_score: Optional[int]
+    related_papers: Optional[str]
+    created_at: datetime
+    mentor_id: int
+    mentor_name: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+@router.post("/saved-gaps", response_model=SavedGapResponse)
 def save_research_gap(
     gap: SavedGapCreate,
     db: Session = Depends(get_db),
@@ -121,9 +140,20 @@ def save_research_gap(
     db.add(saved_gap)
     db.commit()
     db.refresh(saved_gap)
-    return saved_gap
+    
+    # Eager load for response
+    # We can just query it again to be safe and simple
+    saved_gap = db.query(SavedResearchGap).options(
+        joinedload(SavedResearchGap.mentor).joinedload(MentorProfile.user)
+    ).filter(SavedResearchGap.id == saved_gap.id).first()
+    
+    result = saved_gap.__dict__
+    if saved_gap.mentor and saved_gap.mentor.user:
+        result['mentor_name'] = saved_gap.mentor.user.name
+        
+    return result
 
-@router.get("/saved-gaps")
+@router.get("/saved-gaps", response_model=List[SavedGapResponse])
 def get_saved_gaps(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -131,7 +161,18 @@ def get_saved_gaps(
     if current_user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can view saved gaps")
         
-    return db.query(SavedResearchGap).filter(SavedResearchGap.student_id == current_user.id).order_by(SavedResearchGap.created_at.desc()).all()
+    gaps = db.query(SavedResearchGap).options(
+        joinedload(SavedResearchGap.mentor).joinedload(MentorProfile.user)
+    ).filter(SavedResearchGap.student_id == current_user.id).order_by(SavedResearchGap.created_at.desc()).all()
+    
+    results = []
+    for gap in gaps:
+        gap_dict = gap.__dict__
+        if gap.mentor and gap.mentor.user:
+            gap_dict['mentor_name'] = gap.mentor.user.name
+        results.append(gap_dict)
+        
+    return results
 
 @router.delete("/saved-gaps/{gap_id}")
 def delete_saved_gap(

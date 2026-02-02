@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.orm import Session, joinedload
 from app.db.database import get_db
 from app.db.models import Opportunity, User, OpportunitySkill
 from app.schemas import OpportunityCreate, OpportunityResponse, OpportunityUpdate
@@ -57,12 +58,16 @@ def read_opportunities(
         query = query.filter(Opportunity.type == type)
     if mentor_id:
         query = query.filter(Opportunity.mentor_id == mentor_id)
+    
+    # Eager load the mentor relationship
+    query = query.options(joinedload(Opportunity.mentor))
+    
     opportunities = query.offset(skip).limit(limit).all()
     return opportunities
 
 @router.get("/{opportunity_id}", response_model=OpportunityResponse)
 def read_opportunity(opportunity_id: int, db: Session = Depends(get_db)):
-    opportunity = db.query(Opportunity).filter(Opportunity.id == opportunity_id).first()
+    opportunity = db.query(Opportunity).options(joinedload(Opportunity.mentor)).filter(Opportunity.id == opportunity_id).first()
     if not opportunity:
         raise HTTPException(status_code=404, detail="Opportunity not found")
     return opportunity

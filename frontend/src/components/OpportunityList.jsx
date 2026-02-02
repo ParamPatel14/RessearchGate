@@ -82,6 +82,16 @@ const OpportunityList = ({ initialFilters = {} }) => {
                     </div>
                     
                     <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">{opp.title}</h3>
+                    
+                    {opp.mentor && (
+                      <div className="flex items-center gap-2 mb-3 text-sm text-gray-600">
+                         <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+                            {opp.mentor.name ? opp.mentor.name.charAt(0).toUpperCase() : 'M'}
+                         </div>
+                         <span>{opp.mentor.name || 'Unknown Mentor'}</span>
+                      </div>
+                    )}
+
                     <p className="text-gray-600 text-sm mb-4 line-clamp-3">{opp.description}</p>
                     
                     {opp.deadline && (

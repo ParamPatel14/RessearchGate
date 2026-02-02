@@ -101,6 +101,15 @@ const StudentApplications = () => {
                     {opportunity.title || `Opportunity #${app.opportunity_id}`}
                   </h3>
                   
+                  {opportunity.mentor && (
+                    <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
+                        <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[10px]">
+                        {opportunity.mentor.name ? opportunity.mentor.name.charAt(0).toUpperCase() : 'M'}
+                        </div>
+                        <span className="truncate">{opportunity.mentor.name || 'Unknown Mentor'}</span>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                     <FiBriefcase className="flex-shrink-0" />
                     <span className="truncate">{opportunity.type ? opportunity.type.replace('_', ' ') : 'Internship'}</span>
@@ -188,6 +197,12 @@ const StudentApplications = () => {
                         Opportunity Summary
                     </h4>
                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        {selectedApp.opportunity.mentor && (
+                            <p className="text-gray-700 mb-2 flex items-center gap-2">
+                                <span className="font-semibold">Mentor:</span> 
+                                <span className="bg-white px-2 py-0.5 rounded text-sm border border-blue-100">{selectedApp.opportunity.mentor.name}</span>
+                            </p>
+                        )}
                         <p className="text-gray-700 mb-2">
                             <span className="font-semibold">Type:</span> {selectedApp.opportunity.type}
                         </p>

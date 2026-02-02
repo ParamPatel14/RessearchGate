@@ -308,6 +308,55 @@ const MentorApplications = () => {
                   </div>
                 </div>
                 <div className="lg:col-span-2 space-y-8">
+                  {/* Application Specifics */}
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h5 className="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1 flex items-center gap-2">
+                      <FiFileText /> Cover Letter
+                    </h5>
+                    <p className="text-gray-700 text-sm whitespace-pre-wrap leading-relaxed">
+                      {selectedApplication.cover_letter || "No cover letter provided."}
+                    </p>
+                    
+                    <div className="mt-6 flex gap-3 pt-4 border-t border-blue-200">
+                       {statusUpdating === selectedApplication.id ? (
+                          <span className="text-gray-500 text-sm font-medium">Updating status...</span>
+                       ) : (
+                          <>
+                            <button
+                              onClick={() => handleStatusChange(selectedApplication.id, 'reviewing')}
+                              className={`flex-1 py-2 rounded text-sm font-bold border transition-colors ${
+                                selectedApplication.status === 'reviewing' 
+                                  ? 'bg-yellow-100 text-yellow-700 border-yellow-300 ring-2 ring-yellow-400' 
+                                  : 'bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50'
+                              }`}
+                            >
+                              Review
+                            </button>
+                            <button
+                              onClick={() => handleStatusChange(selectedApplication.id, 'accepted')}
+                              className={`flex-1 py-2 rounded text-sm font-bold border transition-colors ${
+                                selectedApplication.status === 'accepted' 
+                                  ? 'bg-green-100 text-green-700 border-green-300 ring-2 ring-green-400' 
+                                  : 'bg-white text-green-600 border-green-200 hover:bg-green-50'
+                              }`}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => handleStatusChange(selectedApplication.id, 'rejected')}
+                              className={`flex-1 py-2 rounded text-sm font-bold border transition-colors ${
+                                selectedApplication.status === 'rejected' 
+                                  ? 'bg-red-100 text-red-700 border-red-300 ring-2 ring-red-400' 
+                                  : 'bg-white text-red-600 border-red-200 hover:bg-red-50'
+                              }`}
+                            >
+                              Reject
+                            </button>
+                          </>
+                       )}
+                    </div>
+                  </div>
+
                   {selectedApplication.student?.student_profile ? (
                     <>
                       {selectedApplication.student.student_profile.bio && (

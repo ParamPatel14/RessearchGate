@@ -131,13 +131,25 @@ const OpportunityDetail = () => {
           <div className="flex justify-between items-start">
             <div>
                 <h1 className="text-3xl font-bold mb-2">{opportunity.title}</h1>
-                <div className="flex items-center gap-4 text-blue-100">
+                <div className="flex flex-wrap items-center gap-4 text-blue-100 mb-4">
                     <span className="flex items-center"><FiBriefcase className="mr-1"/> {opportunity.type.replace('_', ' ')}</span>
                     {opportunity.deadline && (
                         <span className="flex items-center"><FiClock className="mr-1"/> Open till: {new Date(opportunity.deadline).toLocaleDateString()}</span>
                     )}
                     <span className="flex items-center"><FiUsers className="mr-1"/> {opportunity.total_slots || 1} Slots</span>
                 </div>
+                
+                {opportunity.mentor && (
+                  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                    <div className="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                        {opportunity.mentor.name ? opportunity.mentor.name.charAt(0).toUpperCase() : 'M'}
+                    </div>
+                    <div>
+                        <p className="text-xs text-blue-200 uppercase font-semibold tracking-wide">Posted by Mentor</p>
+                        <p className="font-bold text-white">{opportunity.mentor.name || 'Unknown Mentor'}</p>
+                    </div>
+                  </div>
+                )}
             </div>
             {opportunity.funding_amount > 0 && (
                 <div className="bg-white/20 backdrop-blur-sm p-3 rounded-lg text-center">
