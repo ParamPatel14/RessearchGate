@@ -94,13 +94,28 @@ const Dashboard = () => {
                 </div>
               )}
               {displayRole === "mentor" && (
-                <div className="hidden md:flex space-x-4 mr-8">
-                  <button onClick={() => setActiveTab('profile')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'profile' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Profile</button>
-                  <button onClick={() => setActiveTab('post-opp')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'post-opp' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Post Opportunity</button>
-                  <button onClick={() => setActiveTab('applications')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'applications' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Manage Applications</button>
-                  <button onClick={() => setActiveTab('lab')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'lab' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Research Lab</button>
-                  <button onClick={() => setActiveTab('analytics')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'analytics' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Analytics</button>
-                  <button onClick={() => setActiveTab('tools')} className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === 'tools' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}>Tools</button>
+                <div className="hidden lg:flex space-x-1 mr-4 overflow-x-auto">
+                  {[
+                    { id: 'profile', label: 'Profile' },
+                    { id: 'post-opp', label: 'Post Opportunity' },
+                    { id: 'my-opportunities', label: 'My Opportunities' },
+                    { id: 'applications', label: 'Manage Applications' },
+                    { id: 'lab', label: 'Research Lab' },
+                    { id: 'analytics', label: 'Analytics' },
+                    { id: 'tools', label: 'Tools' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                        activeTab === tab.id 
+                          ? 'bg-indigo-100 text-indigo-700' 
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
                 </div>
               )}
 
@@ -273,6 +288,7 @@ const Dashboard = () => {
               >
                 <option value="profile">My Profile</option>
                 <option value="post-opp">Post Opportunity</option>
+                <option value="my-opportunities">My Opportunities</option>
                 <option value="applications">Manage Applications</option>
               </select>
             </div>
@@ -319,6 +335,21 @@ const Dashboard = () => {
 
             {activeTab === 'post-opp' && (
               <OpportunityForm onSuccess={() => setActiveTab('applications')} />
+            )}
+
+            {activeTab === 'my-opportunities' && (
+               <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-bold text-gray-800">My Opportunities</h2>
+                    <button 
+                      onClick={() => setActiveTab('post-opp')}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700"
+                    >
+                      <FiPlusCircle /> Post New
+                    </button>
+                  </div>
+                  <OpportunityList initialFilters={{ mentor_id: currentUser.id }} />
+               </div>
             )}
 
             {activeTab === 'applications' && <MentorApplications />}

@@ -3,7 +3,7 @@ import { getOpportunities } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { FiClock, FiBriefcase, FiArrowRight } from 'react-icons/fi';
 
-const OpportunityList = () => {
+const OpportunityList = ({ initialFilters = {} }) => {
   const navigate = useNavigate();
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,12 +11,12 @@ const OpportunityList = () => {
 
   useEffect(() => {
     fetchOpportunities();
-  }, [filterType]);
+  }, [filterType, initialFilters]);
 
   const fetchOpportunities = async () => {
     setLoading(true);
     try {
-      const filters = filterType ? { type: filterType } : {};
+      const filters = { ...initialFilters, ...(filterType ? { type: filterType } : {}) };
       const data = await getOpportunities(filters);
       setOpportunities(data);
     } catch (err) {

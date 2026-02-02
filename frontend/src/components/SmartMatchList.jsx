@@ -62,7 +62,10 @@ const SmartMatchList = () => {
     setApplySuccess(false);
     
     try {
+      console.log("Fetching opportunities for mentor:", mentor.mentor_id); // Debug log
       const opportunities = await getOpportunities({ mentor_id: mentor.mentor_id });
+      console.log("Fetched opportunities:", opportunities); // Debug log
+      
       // Filter only open opportunities
       const openOpportunities = opportunities.filter(op => op.is_open);
       setMentorOpportunities(openOpportunities);
@@ -89,7 +92,12 @@ const SmartMatchList = () => {
         setApplySuccess(false);
       }, 2000);
     } catch (err) {
-      alert("Failed to submit application. You may have already applied.");
+      // Check if error message indicates duplicate application
+      if (err.response && err.response.status === 400 && err.response.data.detail === "You have already applied to this opportunity") {
+          alert("You have already applied to this opportunity.");
+      } else {
+          alert("Failed to submit application. Please try again.");
+      }
     } finally {
       setApplying(false);
     }
@@ -317,12 +325,18 @@ const SmartMatchList = () => {
 
       {/* Apply Modal */}
       {showApplyModal && selectedMentor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-800">Apply to {selectedMentor.mentor_name}</h3>
-                <button onClick={() => setShowApplyModal(false)} className="text-gray-400 hover:text-gray-600">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/20">
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Apply to Lab</h3>
+                  <p className="text-indigo-600 font-medium">{selectedMentor.mentor_name}</p>
+                </div>
+                <button 
+                  onClick={() => setShowApplyModal(false)} 
+                  className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 hover:text-gray-700 transition-colors"
+                >
                   <FaTimes />
                 </button>
               </div>
