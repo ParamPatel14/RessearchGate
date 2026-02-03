@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getMentorApplications, updateApplicationStatus } from '../api';
 import { FaTimes, FaCheck, FaBan, FaSearch, FaFilter } from 'react-icons/fa';
-import { FiUser, FiMail, FiMapPin, FiLinkedin, FiGithub, FiGlobe, FiFileText, FiBriefcase, FiBookOpen, FiAward } from 'react-icons/fi';
+import { FiUser, FiMail, FiMapPin, FiLinkedin, FiGithub, FiGlobe, FiFileText, FiBriefcase, FiBookOpen, FiAward, FiSearch } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MentorApplications = () => {

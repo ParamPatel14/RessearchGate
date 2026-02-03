@@ -100,7 +100,10 @@ def update_application_status(
     if current_user.role != "mentor":
         raise HTTPException(status_code=403, detail="Only mentors can update application status")
     
-    application = db.query(Application).filter(Application.id == application_id).first()
+    application = db.query(Application)\
+        .options(joinedload(Application.student).joinedload(User.student_profile))\
+        .filter(Application.id == application_id)\
+        .first()
     if not application:
         raise HTTPException(status_code=404, detail="Application not found")
     
@@ -126,12 +129,15 @@ def update_application_status(
         db.add(new_message)
 
         # Send WhatsApp Notification
-        # Use the specific test number as requested by user
-        student_phone = "+918105350692"
+        student_phone = None
         
-        # In production, use real profile phone:
-        # if application.student and application.student.student_profile and application.student.student_profile.phone_number:
-        #     student_phone = application.student.student_profile.phone_number
+        # Priority 1: Use Student's Profile Number
+        if application.student and application.student.student_profile and application.student.student_profile.phone_number:
+            student_phone = application.student.student_profile.phone_number
+        
+        # Priority 2: Fallback to Test Number (for Sandbox testing)
+        if not student_phone:
+             student_phone = "+918105350692"
 
         if student_phone:
             student_name = application.student.name
