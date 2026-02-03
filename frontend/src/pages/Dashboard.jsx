@@ -11,6 +11,7 @@ import StudentApplications from "../components/StudentApplications";
 import ResearchLab from "../components/ResearchLab";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
 import SmartMatchList from "../components/SmartMatchList";
+import ErrorBoundary from "../components/ErrorBoundary";
 import { FiLogOut, FiActivity, FiBook, FiUser, FiPlusCircle, FiList, FiBriefcase, FiCpu } from "react-icons/fi";
 
 const Dashboard = () => {
@@ -340,7 +341,11 @@ const Dashboard = () => {
               <OpportunityList initialFilters={{ mentor_id: currentUser.id }} />
             )}
 
-            {activeTab === 'applications' && <MentorApplications />}
+            {activeTab === 'applications' && (
+              <ErrorBoundary>
+                <MentorApplications />
+              </ErrorBoundary>
+            )}
 
             {activeTab === 'lab' && <ResearchLab />}
 

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 import json
 from datetime import datetime
 from app.db.database import get_db
-from app.db.models import Application, Opportunity, User, Message
+from app.db.models import Application, Opportunity, User, Message, StudentProfile
 from app.schemas import ApplicationCreate, ApplicationResponse, ApplicationUpdate
 from app.deps import get_current_user
 from app.services.matching import calculate_match_score
@@ -77,7 +77,17 @@ def read_mentor_applications(
         raise HTTPException(status_code=403, detail="Only mentors can view applications for their opportunities")
     
     # Join Opportunity to filter by mentor_id and order by match_score descending (Ranked Applicants)
-    applications = db.query(Application).join(Opportunity).filter(Opportunity.mentor_id == current_user.id).order_by(Application.match_score.desc()).all()
+    applications = db.query(Application)\
+        .join(Opportunity)\
+        .options(
+            joinedload(Application.student).joinedload(User.student_profile).joinedload(StudentProfile.projects),
+            joinedload(Application.student).joinedload(User.student_profile).joinedload(StudentProfile.educations),
+            joinedload(Application.student).joinedload(User.student_profile).joinedload(StudentProfile.work_experiences),
+            joinedload(Application.opportunity)
+        )\
+        .filter(Opportunity.mentor_id == current_user.id)\
+        .order_by(Application.match_score.desc())\
+        .all()
     return applications
 
 @router.put("/{application_id}/status", response_model=ApplicationResponse)
