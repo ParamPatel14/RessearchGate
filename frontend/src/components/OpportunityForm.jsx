@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createOpportunity, getSkills, createSkill, createVisit } from '../api';
+import { createOpportunity, getSkills, createSkill, createVisit, createBeehiveEvent } from '../api';
 import { 
     FiBriefcase, FiAlignLeft, FiCalendar, FiPlus, FiX, 
     FiCheck, FiSearch, FiTarget, FiDollarSign, FiAward, 
-    FiLayers, FiZap, FiLayout, FiClock, FiMapPin, FiGlobe 
+    FiLayers, FiZap, FiLayout, FiClock, FiMapPin, FiGlobe, FiHexagon 
 } from 'react-icons/fi';
 
 const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
@@ -21,11 +21,23 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
     curriculum: '',
     company_name: '',
     location: '',
-    visit_date: ''
+    visit_date: '',
+    event_date: '',
+    duration_hours: 0,
+    entry_fee: 0
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState('');
+
+  // Get user role from local storage
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        setUserRole(user.role);
+    }
+  }, []);
   
   // Skills Management
   const [availableSkills, setAvailableSkills] = useState([]);
@@ -79,6 +91,18 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
           max_students: formData.total_slots
         };
         await createVisit(visitPayload);
+      } else if (formData.type === 'beehive_event') {
+        // Prepare payload for Beehive Event
+        const beehivePayload = {
+            title: formData.title,
+            description: formData.description,
+            event_date: formData.event_date,
+            duration_hours: formData.duration_hours,
+            max_seats: formData.total_slots,
+            entry_fee: formData.entry_fee,
+            is_active: formData.is_open
+        };
+        await createBeehiveEvent(beehivePayload);
       } else {
         // Prepare payload for Opportunity
         payload = {
@@ -118,7 +142,10 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
         curriculum: '',
         company_name: '',
         location: '',
-        visit_date: ''
+        visit_date: '',
+        event_date: '',
+        duration_hours: 0,
+        entry_fee: 0
       });
       setSelectedSkills([]);
       
@@ -257,6 +284,9 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 <option value="research_assistant">Research Assistant</option>
                                 <option value="phd_guidance">PhD Guidance</option>
                                 <option value="industrial_visit">Industrial Visit</option>
+                                {userRole === 'admin' && (
+                                    <option value="beehive_event">Beehive Event</option>
+                                )}
                             </select>
                         </div>
                     </div>
@@ -339,8 +369,67 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                     </div>
                 )}
 
+                {/* Beehive Event Specific Fields */}
+                {formData.type === 'beehive_event' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                         <div className="col-span-1">
+                            <label className="block text-[var(--color-academia-charcoal)] text-sm font-bold mb-2">Event Date</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <FiCalendar className="text-stone-400" />
+                                </div>
+                                <input
+                                    type="datetime-local"
+                                    name="event_date"
+                                    value={formData.event_date}
+                                    onChange={handleChange}
+                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    required={formData.type === 'beehive_event'}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="col-span-1">
+                            <label className="block text-[var(--color-academia-charcoal)] text-sm font-bold mb-2">Duration (Hours)</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <FiClock className="text-stone-400" />
+                                </div>
+                                <input
+                                    type="number"
+                                    name="duration_hours"
+                                    value={formData.duration_hours}
+                                    onChange={handleChange}
+                                    step="0.5"
+                                    min="0"
+                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    required={formData.type === 'beehive_event'}
+                                />
+                            </div>
+                        </div>
+
+                         <div className="col-span-1">
+                            <label className="block text-[var(--color-academia-charcoal)] text-sm font-bold mb-2">Entry Fee</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <FiDollarSign className="text-stone-400" />
+                                </div>
+                                <input
+                                    type="number"
+                                    name="entry_fee"
+                                    value={formData.entry_fee}
+                                    onChange={handleChange}
+                                    min="0"
+                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    required={formData.type === 'beehive_event'}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     {formData.type !== 'industrial_visit' && (
+                     {formData.type !== 'industrial_visit' && formData.type !== 'beehive_event' && (
                         <div>
                             <label className="block text-[var(--color-academia-charcoal)] text-sm font-bold mb-2">Application Deadline</label>
                             <div className="relative">

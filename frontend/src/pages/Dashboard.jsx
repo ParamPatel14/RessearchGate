@@ -85,17 +85,27 @@ const Dashboard = () => {
             <div className="flex items-center space-x-4">
               {/* Tabs Navigation */}
               {displayRole === "student" && (
-                <div className="hidden md:flex space-x-4 mr-8">
-                  <button onClick={() => setActiveTab('profile')} className={`px-4 py-2 rounded-sm text-sm font-medium transition-all ${activeTab === 'profile' ? 'bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] shadow-md' : 'text-stone-600 hover:text-[var(--color-academia-charcoal)] hover:bg-stone-100'}`}>Profile</button>
-                  <button onClick={() => setActiveTab('smart-match')} className={`px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'smart-match' ? 'bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] shadow-md' : 'text-stone-600 hover:text-[var(--color-academia-charcoal)] hover:bg-stone-100'}`}>
-                    <FiCpu className={activeTab === 'smart-match' ? 'text-[var(--color-academia-gold)]' : 'text-stone-400'} /> Smart Match
-                  </button>
-                  <button onClick={() => setActiveTab('browse')} className={`px-4 py-2 rounded-sm text-sm font-medium transition-all ${activeTab === 'browse' ? 'bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] shadow-md' : 'text-stone-600 hover:text-[var(--color-academia-charcoal)] hover:bg-stone-100'}`}>Browse Opportunities</button>
-                  <button onClick={() => setActiveTab('applications')} className={`px-4 py-2 rounded-sm text-sm font-medium transition-all ${activeTab === 'applications' ? 'bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] shadow-md' : 'text-stone-600 hover:text-[var(--color-academia-charcoal)] hover:bg-stone-100'}`}>My Applications</button>
-                  <button onClick={() => setActiveTab('real-world')} className={`px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'real-world' ? 'bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] shadow-md' : 'text-stone-600 hover:text-[var(--color-academia-charcoal)] hover:bg-stone-100'}`}>
-                    <FiGlobe className={activeTab === 'real-world' ? 'text-[var(--color-academia-gold)]' : 'text-stone-400'} /> Real World
-                  </button>
-                  <button onClick={() => setActiveTab('lab')} className={`px-4 py-2 rounded-sm text-sm font-medium transition-all ${activeTab === 'lab' ? 'bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] shadow-md' : 'text-stone-600 hover:text-[var(--color-academia-charcoal)] hover:bg-stone-100'}`}>Research Lab</button>
+                <div className="hidden lg:flex space-x-1 mr-4 overflow-x-auto">
+                  {[
+                    { id: 'profile', label: 'Profile', icon: null },
+                    { id: 'smart-match', label: 'Smart Match', icon: FiCpu },
+                    { id: 'browse', label: 'Browse Opportunities', icon: null },
+                    { id: 'applications', label: 'My Applications', icon: null },
+                    { id: 'real-world', label: 'Real World Opportunities', icon: FiGlobe }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`whitespace-nowrap px-4 py-2 rounded-sm text-sm font-medium transition-all flex items-center gap-2 ${
+                        activeTab === tab.id 
+                          ? 'bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] shadow-md' 
+                          : 'text-stone-600 hover:text-[var(--color-academia-charcoal)] hover:bg-stone-100'
+                      }`}
+                    >
+                      {tab.icon && <tab.icon className={activeTab === tab.id ? 'text-[var(--color-academia-gold)]' : 'text-stone-400'} />}
+                      {tab.label}
+                    </button>
+                  ))}
                 </div>
               )}
               {displayRole === "mentor" && (
@@ -105,7 +115,6 @@ const Dashboard = () => {
                     { id: 'post-opp', label: 'Post Opportunity' },
                     { id: 'my-opportunities', label: 'My Opportunities' },
                     { id: 'applications', label: 'Manage Applications' },
-                    { id: 'lab', label: 'Research Lab' },
                     { id: 'analytics', label: 'Analytics' }
                   ].map(tab => (
                     <button
@@ -187,8 +196,10 @@ const Dashboard = () => {
                 className="block w-full rounded-sm border-stone-200 shadow-sm focus:border-[var(--color-academia-gold)] focus:ring-[var(--color-academia-gold)] bg-white text-[var(--color-academia-charcoal)]"
               >
                 <option value="profile">My Profile</option>
+                <option value="smart-match">Smart Match</option>
                 <option value="browse">Browse Opportunities</option>
                 <option value="applications">My Applications</option>
+                <option value="real-world">Real World Opportunities</option>
               </select>
             </div>
 
@@ -274,8 +285,6 @@ const Dashboard = () => {
             
             {activeTab === 'applications' && <StudentApplications />}
             
-            {activeTab === 'lab' && <ResearchLab />}
-
             {activeTab === 'real-world' && <RealWorldDashboard />}
 
 

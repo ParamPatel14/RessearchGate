@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getOpportunities } from '../api';
+import { getOpportunities, getVisits, getBeehiveEvents } from '../api';
 import { useNavigate } from 'react-router-dom';
-import { FiClock, FiBriefcase, FiArrowRight, FiUser, FiSearch, FiFilter } from 'react-icons/fi';
+import { FiClock, FiBriefcase, FiArrowRight, FiUser, FiSearch, FiFilter, FiMapPin, FiCalendar, FiHexagon } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const OpportunityList = ({ initialFilters = {} }) => {
@@ -27,7 +27,28 @@ const OpportunityList = ({ initialFilters = {} }) => {
   const fetchOpportunities = async (filters) => {
     setLoading(true);
     try {
-      const data = await getOpportunities(filters);
+      let data = [];
+      if (filters.type === 'industrial_visit') {
+        data = await getVisits();
+        // Normalize data for display
+        data = data.map(item => ({
+            ...item,
+            type: 'industrial_visit',
+            mentor: item.organizer, // Map organizer to mentor for UI consistency
+            deadline: item.visit_date // Use visit date as deadline for sorting/display
+        }));
+      } else if (filters.type === 'beehive_event') {
+        data = await getBeehiveEvents();
+        // Normalize data
+        data = data.map(item => ({
+            ...item,
+            type: 'beehive_event',
+            mentor: item.organizer,
+            deadline: item.event_date
+        }));
+      } else {
+        data = await getOpportunities(filters);
+      }
       setOpportunities(data);
     } catch (err) {
       console.error("Failed to fetch opportunities", err);
@@ -42,6 +63,8 @@ const OpportunityList = ({ initialFilters = {} }) => {
       case 'research_assistant': return 'bg-purple-50 text-purple-900 border-purple-200';
       case 'phd_guidance': return 'bg-amber-50 text-amber-900 border-amber-200';
       case 'grant': return 'bg-emerald-50 text-emerald-900 border-emerald-200';
+      case 'industrial_visit': return 'bg-orange-50 text-orange-900 border-orange-200';
+      case 'beehive_event': return 'bg-yellow-50 text-yellow-900 border-yellow-200';
       default: return 'bg-stone-50 text-stone-900 border-stone-200';
     }
   };
@@ -88,6 +111,8 @@ const OpportunityList = ({ initialFilters = {} }) => {
               <option value="research_assistant">Research Assistant</option>
               <option value="phd_guidance">PhD Guidance</option>
               <option value="grant">Grant / Collaboration</option>
+              <option value="industrial_visit">Industrial Visits</option>
+              <option value="beehive_event">Beehive Events</option>
             </select>
           </div>
         </div>
@@ -166,8 +191,17 @@ const OpportunityList = ({ initialFilters = {} }) => {
                 <div className="px-6 py-4 border-t border-stone-100 bg-stone-50/50 flex justify-between items-center group-hover:bg-[var(--color-academia-cream)]/30 transition-colors">
                   {opp.deadline ? (
                     <div className="flex items-center text-stone-500 text-xs font-medium">
-                      <FiClock className="mr-1.5 text-[var(--color-academia-gold)]" />
-                      <span>Due: {new Date(opp.deadline).toLocaleDateString()}</span>
+                      {opp.type === 'industrial_visit' || opp.type === 'beehive_event' ? (
+                        <>
+                            <FiCalendar className="mr-1.5 text-[var(--color-academia-gold)]" />
+                            <span>Date: {new Date(opp.deadline).toLocaleDateString()}</span>
+                        </>
+                      ) : (
+                        <>
+                            <FiClock className="mr-1.5 text-[var(--color-academia-gold)]" />
+                            <span>Due: {new Date(opp.deadline).toLocaleDateString()}</span>
+                        </>
+                      )}
                     </div>
                   ) : (
                     <div className="text-xs text-stone-400">No deadline</div>
