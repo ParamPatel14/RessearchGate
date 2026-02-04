@@ -20,6 +20,94 @@ class SkillResponse(SkillBase):
     class Config:
         from_attributes = True
 
+# --- Real World Project Interest ---
+class RealWorldProjectInterestBase(BaseModel):
+    interest_area: str
+    preferred_industry: Optional[str] = None
+    current_skills: Optional[str] = None
+
+class RealWorldProjectInterestCreate(RealWorldProjectInterestBase):
+    pass
+
+class RealWorldProjectInterestUpdate(BaseModel):
+    status: Optional[str] = None
+
+class RealWorldProjectInterestResponse(RealWorldProjectInterestBase):
+    id: int
+    student_id: int
+    status: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+# --- Industrial Visit ---
+class IndustrialVisitBase(BaseModel):
+    title: str
+    company_name: str
+    location: str
+    description: Optional[str] = None
+    visit_date: datetime
+    max_students: int = 20
+
+class IndustrialVisitCreate(IndustrialVisitBase):
+    pass
+
+class IndustrialVisitResponse(IndustrialVisitBase):
+    id: int
+    organizer_id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class IndustrialVisitEnrollmentBase(BaseModel):
+    visit_id: int
+
+class IndustrialVisitEnrollmentCreate(IndustrialVisitEnrollmentBase):
+    pass
+
+class IndustrialVisitEnrollmentResponse(IndustrialVisitEnrollmentBase):
+    id: int
+    student_id: int
+    status: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+# --- Beehive Event ---
+class BeehiveEventBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    event_date: datetime
+    duration_hours: float
+    max_seats: int = 30
+    entry_fee: float = 1500.0
+    is_active: bool = True
+
+class BeehiveEventCreate(BeehiveEventBase):
+    pass
+
+class BeehiveEventResponse(BeehiveEventBase):
+    id: int
+    organizer_id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class BeehiveEnrollmentBase(BaseModel):
+    event_id: int
+
+class BeehiveEnrollmentCreate(BeehiveEnrollmentBase):
+    pass
+
+class BeehiveEnrollmentResponse(BeehiveEnrollmentBase):
+    id: int
+    student_id: int
+    payment_status: str
+    status: str
+    enrolled_at: datetime
+    class Config:
+        from_attributes = True
+
 class OpportunitySkillBase(BaseModel):
     skill_id: int
     weight: int = 1 # 1-5 scale
