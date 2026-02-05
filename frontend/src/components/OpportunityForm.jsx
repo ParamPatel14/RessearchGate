@@ -210,8 +210,10 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
 
   const exactMatch = filteredSkills.some(s => s.name.toLowerCase() === skillSearch.toLowerCase());
 
+  const inputClasses = "w-full pl-10 pr-4 py-3 border border-stone-300 rounded-sm focus:outline-none focus:border-[var(--color-academia-gold)] focus:ring-1 focus:ring-[var(--color-academia-gold)] transition-colors bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)] placeholder-stone-400";
+
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden font-sans">
+    <div className="bg-white rounded-sm shadow-lg border border-stone-200 overflow-hidden font-sans">
       <div className="bg-[var(--color-academia-charcoal)] p-8 text-[var(--color-academia-cream)]">
           <h2 className="text-3xl font-serif font-bold flex items-center gap-3 tracking-wide">
               <FiZap className="text-[var(--color-academia-gold)]" />
@@ -222,7 +224,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
       
       <div className="p-8">
         {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 flex items-start gap-3">
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-sm mb-6 flex items-start gap-3">
                 <FiX className="mt-1 flex-shrink-0" />
                 <div>
                     <p className="font-bold">Error</p>
@@ -232,7 +234,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
         )}
         
         {success && (
-            <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded mb-6 flex items-start gap-3">
+            <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-sm mb-6 flex items-start gap-3">
                 <FiCheck className="mt-1 flex-shrink-0" />
                 <div>
                     <p className="font-bold">Success</p>
@@ -262,7 +264,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 value={formData.title}
                                 onChange={handleChange}
                                 placeholder="e.g. AI Research Intern, Backend Developer"
-                                className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] focus:border-transparent transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                className={inputClasses}
                                 required
                             />
                         </div>
@@ -278,7 +280,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 name="type"
                                 value={formData.type}
                                 onChange={handleChange}
-                                className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] focus:border-transparent transition bg-[var(--color-academia-cream)] hover:bg-white appearance-none text-[var(--color-academia-charcoal)]"
+                                className={inputClasses}
                             >
                                 <option value="internship">Internship</option>
                                 <option value="research_assistant">Research Assistant</option>
@@ -305,7 +307,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 value={formData.total_slots}
                                 onChange={handleChange}
                                 min="1"
-                                className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                className={inputClasses}
                             />
                          </div>
                     </div>
@@ -326,7 +328,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     value={formData.company_name}
                                     onChange={handleChange}
                                     placeholder="e.g. Google, Tesla"
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    className={inputClasses}
                                     required={formData.type === 'industrial_visit'}
                                 />
                             </div>
@@ -344,7 +346,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     value={formData.location}
                                     onChange={handleChange}
                                     placeholder="e.g. Mountain View, CA"
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    className={inputClasses}
                                     required={formData.type === 'industrial_visit'}
                                 />
                             </div>
@@ -361,7 +363,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     name="visit_date"
                                     value={formData.visit_date}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    className={inputClasses}
                                     required={formData.type === 'industrial_visit'}
                                 />
                             </div>
@@ -383,7 +385,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     name="event_date"
                                     value={formData.event_date}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    className={inputClasses}
                                     required={formData.type === 'beehive_event'}
                                 />
                             </div>
@@ -402,7 +404,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     onChange={handleChange}
                                     step="0.5"
                                     min="0"
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    className={inputClasses}
                                     required={formData.type === 'beehive_event'}
                                 />
                             </div>
@@ -420,7 +422,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     value={formData.entry_fee}
                                     onChange={handleChange}
                                     min="0"
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    className={inputClasses}
                                     required={formData.type === 'beehive_event'}
                                 />
                             </div>
@@ -441,14 +443,14 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     name="deadline"
                                     value={formData.deadline}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                                    className={inputClasses}
                                 />
                             </div>
                         </div>
                      )}
                     
                     <div className="flex items-center pt-8">
-                        <label className="flex items-center cursor-pointer">
+                        <label className="flex items-center cursor-pointer group">
                             <div className="relative">
                                 <input
                                     type="checkbox"
@@ -460,7 +462,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 <div className={`block w-14 h-8 rounded-full transition-colors ${formData.is_open ? 'bg-[var(--color-academia-gold)]' : 'bg-stone-300'}`}></div>
                                 <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.is_open ? 'transform translate-x-6' : ''}`}></div>
                             </div>
-                            <div className="ml-3 text-[var(--color-academia-charcoal)] font-medium">
+                            <div className="ml-3 text-[var(--color-academia-charcoal)] font-medium group-hover:text-[var(--color-academia-gold)] transition-colors">
                                 Immediately Open
                             </div>
                         </label>
@@ -470,7 +472,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
 
             {/* Grant Details (Conditional) */}
             {formData.type === 'grant' && (
-                <div className="bg-[var(--color-academia-cream)] p-6 rounded-xl border border-stone-200 space-y-4 animate-fade-in">
+                <div className="bg-[var(--color-academia-cream)] p-6 rounded-sm border border-stone-200 space-y-4 animate-fade-in">
                     <div className="flex items-center gap-2 text-[var(--color-academia-charcoal)] border-b border-stone-200 pb-2 mb-2">
                         <FiDollarSign className="text-[var(--color-academia-gold)]" />
                         <h3 className="text-lg font-serif font-semibold">Grant Details</h3>
@@ -483,7 +485,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 name="funding_amount"
                                 value={formData.funding_amount}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[var(--color-academia-gold)] bg-white text-[var(--color-academia-charcoal)]"
+                                className={inputClasses.replace("bg-[var(--color-academia-cream)]", "bg-white")}
                                 min="0"
                             />
                         </div>
@@ -493,7 +495,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 name="currency"
                                 value={formData.currency}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-stone-200 rounded-lg bg-white text-[var(--color-academia-charcoal)] focus:ring-[var(--color-academia-gold)]"
+                                className={inputClasses.replace("bg-[var(--color-academia-cream)]", "bg-white")}
                             >
                                 <option value="USD">USD ($)</option>
                                 <option value="EUR">EUR (€)</option>
@@ -508,7 +510,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 name="grant_agency"
                                 value={formData.grant_agency}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-stone-200 rounded-lg bg-white text-[var(--color-academia-charcoal)] focus:ring-[var(--color-academia-gold)]"
+                                className={inputClasses.replace("bg-[var(--color-academia-cream)]", "bg-white")}
                                 placeholder="e.g. NSF"
                             />
                         </div>
@@ -531,7 +533,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                         onChange={handleChange}
                         rows="4"
                         placeholder="Describe the role, responsibilities, and what the student will learn..."
-                        className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                        className={inputClasses}
                         required
                     />
                 </div>
@@ -544,7 +546,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                         onChange={handleChange}
                         rows="3"
                         placeholder="Specific prerequisites, eligibility criteria, etc."
-                        className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                        className={inputClasses}
                     />
                 </div>
 
@@ -556,7 +558,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                         onChange={handleChange}
                         rows="3"
                         placeholder="Outline the learning modules, weekly plan, or syllabus..."
-                        className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)]"
+                        className={inputClasses}
                     />
                 </div>
             </div>
@@ -568,7 +570,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                     <h3 className="text-xl font-serif font-bold tracking-wide">Required Skills</h3>
                 </div>
                 
-                <div className="bg-[var(--color-academia-cream)] p-6 rounded-xl border border-stone-200">
+                <div className="bg-[var(--color-academia-cream)] p-6 rounded-sm border border-stone-200">
                     <label className="block text-[var(--color-academia-charcoal)] text-sm font-bold mb-2">Add Skills (Type to search or create)</label>
                     <div className="relative" ref={skillInputRef}>
                         <div className="flex gap-2">
@@ -585,29 +587,29 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                     }}
                                     onFocus={() => setShowSkillDropdown(true)}
                                     placeholder="e.g. Python, React, Machine Learning..."
-                                    className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-academia-gold)] transition bg-white text-[var(--color-academia-charcoal)]"
+                                    className="w-full pl-10 pr-4 py-3 border border-stone-300 rounded-sm focus:outline-none focus:border-[var(--color-academia-gold)] focus:ring-1 focus:ring-[var(--color-academia-gold)] transition bg-white text-[var(--color-academia-charcoal)]"
                                 />
                             </div>
                         </div>
 
                         {/* Dropdown */}
                         {showSkillDropdown && skillSearch && (
-                            <div className="absolute z-10 w-full mt-1 bg-white border border-stone-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                            <div className="absolute z-10 w-full mt-1 bg-white border border-stone-200 rounded-sm shadow-xl max-h-60 overflow-y-auto">
                                 {filteredSkills.map(skill => (
                                     <div 
                                         key={skill.id}
                                         onClick={() => handleAddSkill(skill)}
                                         className="px-4 py-3 hover:bg-[var(--color-academia-cream)] cursor-pointer flex items-center justify-between group"
                                     >
-                                        <span className="font-medium text-[#222222] group-hover:text-[#C5A028]">{skill.name}</span>
-                                        <FiPlus className="text-stone-400 group-hover:text-[#C5A028]" />
+                                        <span className="font-medium text-[var(--color-academia-charcoal)] group-hover:text-[var(--color-academia-gold)]">{skill.name}</span>
+                                        <FiPlus className="text-stone-400 group-hover:text-[var(--color-academia-gold)]" />
                                     </div>
                                 ))}
                                 
                                 {!exactMatch && skillSearch.trim() && (
                                     <div 
                                         onClick={handleCreateAndAddSkill}
-                                        className="px-4 py-3 hover:bg-[#F7F5F0] cursor-pointer flex items-center gap-2 text-[#C5A028] border-t border-stone-100"
+                                        className="px-4 py-3 hover:bg-[var(--color-academia-cream)] cursor-pointer flex items-center gap-2 text-[var(--color-academia-gold)] border-t border-stone-100"
                                     >
                                         <FiPlus className="font-bold" />
                                         <span>Create new skill: <strong>"{skillSearch}"</strong></span>
@@ -627,7 +629,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                     {selectedSkills.length > 0 ? (
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
                             {selectedSkills.map((item) => (
-                                <div key={item.skill_id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-stone-200 shadow-sm animate-fade-in">
+                                <div key={item.skill_id} className="flex items-center justify-between bg-white p-3 rounded-sm border border-stone-200 shadow-sm animate-fade-in">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-[var(--color-academia-charcoal)] flex items-center justify-center text-[var(--color-academia-gold)] font-bold text-sm border border-[var(--color-academia-gold)]">
                                             {item.name.substring(0,2).toUpperCase()}
@@ -639,7 +641,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                         <select
                                             value={item.weight}
                                             onChange={(e) => handleSkillWeightChange(item.skill_id, e.target.value)}
-                                            className="text-xs bg-[var(--color-academia-cream)] border border-stone-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[var(--color-academia-gold)] text-[var(--color-academia-charcoal)]"
+                                            className="text-xs bg-[var(--color-academia-cream)] border border-stone-200 rounded-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[var(--color-academia-gold)] text-[var(--color-academia-charcoal)]"
                                             title="Skill Importance"
                                         >
                                             <option value="1">Nice to have</option>
@@ -658,7 +660,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                             ))}
                         </div>
                     ) : (
-                        <div className="mt-4 text-center py-6 bg-[var(--color-academia-cream)] border border-dashed border-stone-300 rounded-lg text-stone-500">
+                        <div className="mt-4 text-center py-6 bg-[var(--color-academia-cream)] border border-dashed border-stone-300 rounded-sm text-stone-500">
                             <FiAward className="mx-auto text-2xl mb-2 opacity-50 text-[var(--color-academia-gold)]" />
                             <p>No skills added yet. Add skills to help students match.</p>
                         </div>
@@ -670,7 +672,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] font-serif font-bold py-4 px-6 rounded-xl hover:shadow-lg hover:shadow-yellow-500/20 transform transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-academia-gold)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg border border-[var(--color-academia-charcoal)] hover:border-[var(--color-academia-gold)]"
+                    className="w-full bg-[var(--color-academia-charcoal)] text-[var(--color-academia-cream)] font-serif font-bold py-4 px-6 rounded-sm hover:shadow-lg hover:shadow-[var(--color-academia-gold)]/20 transform transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-academia-gold)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg border border-[var(--color-academia-charcoal)] hover:border-[var(--color-academia-gold)]"
                 >
                     {loading ? (
                         <>
