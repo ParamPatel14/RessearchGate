@@ -78,11 +78,11 @@ const LandingPage = () => {
         </div>
 
         {/* Right Visualization */}
-        <div className="lg:w-1/2 relative h-[50vh] lg:h-auto bg-[#F7F5F0] overflow-hidden">
+        <div className="lg:w-1/2 relative h-[50vh] lg:h-auto bg-[var(--color-academia-cream)] overflow-hidden">
              <NetworkVisualization />
              {/* Gradient Overlay for seamless blend */}
-             <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-academia-cream)] to-transparent w-32 pointer-events-none hidden lg:block"></div>
-             <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-academia-cream)] to-transparent h-32 pointer-events-none lg:hidden"></div>
+             <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-academia-cream)] to-transparent w-16 pointer-events-none hidden lg:block"></div>
+             <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-academia-cream)] to-transparent h-16 pointer-events-none lg:hidden"></div>
         </div>
       </header>
       
