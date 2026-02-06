@@ -210,16 +210,20 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
 
   const exactMatch = filteredSkills.some(s => s.name.toLowerCase() === skillSearch.toLowerCase());
 
-  const inputClasses = "w-full pl-10 pr-4 py-3 border border-stone-300 rounded-sm focus:outline-none focus:border-[var(--color-academia-gold)] focus:ring-1 focus:ring-[var(--color-academia-gold)] transition-colors bg-[var(--color-academia-cream)] hover:bg-white text-[var(--color-academia-charcoal)] placeholder-stone-400";
+  // Refined Input Classes - Clean, white background with gold focus
+  const inputClasses = "w-full pl-10 pr-4 py-3 border border-stone-200 rounded-sm focus:outline-none focus:border-[var(--color-academia-gold)] focus:ring-2 focus:ring-[var(--color-academia-gold)]/10 transition-all bg-white hover:border-stone-300 text-[var(--color-academia-charcoal)] placeholder-stone-400 shadow-sm";
 
   return (
-    <div className="bg-white rounded-sm shadow-lg border border-stone-200 overflow-hidden font-sans">
-      <div className="bg-[var(--color-academia-charcoal)] p-8 text-[var(--color-academia-cream)]">
-          <h2 className="text-3xl font-serif font-bold flex items-center gap-3 tracking-wide">
-              <FiZap className="text-[var(--color-academia-gold)]" />
+    <div className="bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden font-sans relative">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--color-academia-charcoal)] via-[var(--color-academia-gold)] to-[var(--color-academia-charcoal)]"></div>
+      <div className="bg-stone-50 p-8 border-b border-stone-200">
+          <h2 className="text-3xl font-serif font-bold flex items-center gap-3 tracking-wide text-[var(--color-academia-charcoal)]">
+              <div className="p-2 bg-[var(--color-academia-charcoal)] rounded-sm text-[var(--color-academia-gold)] shadow-md">
+                <FiZap size={24} />
+              </div>
               Post New Opportunity
           </h2>
-          <p className="text-stone-300 mt-2 text-lg">Create an exciting role for students to apply to.</p>
+          <p className="text-stone-500 mt-2 text-lg pl-14">Create an exciting role for students to apply to.</p>
       </div>
       
       <div className="p-8">
@@ -472,12 +476,13 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
 
             {/* Grant Details (Conditional) */}
             {formData.type === 'grant' && (
-                <div className="bg-[var(--color-academia-cream)] p-6 rounded-sm border border-stone-200 space-y-4 animate-fade-in">
-                    <div className="flex items-center gap-2 text-[var(--color-academia-charcoal)] border-b border-stone-200 pb-2 mb-2">
+                <div className="bg-[var(--color-academia-cream)] p-6 rounded-sm border border-stone-200 space-y-4 animate-fade-in relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-academia-gold)] opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                    <div className="flex items-center gap-2 text-[var(--color-academia-charcoal)] border-b border-stone-200 pb-2 mb-2 relative z-10">
                         <FiDollarSign className="text-[var(--color-academia-gold)]" />
                         <h3 className="text-lg font-serif font-semibold">Grant Details</h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
                         <div>
                             <label className="block text-[var(--color-academia-charcoal)] text-sm font-bold mb-2">Amount</label>
                             <input
@@ -485,7 +490,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 name="funding_amount"
                                 value={formData.funding_amount}
                                 onChange={handleChange}
-                                className={inputClasses.replace("bg-[var(--color-academia-cream)]", "bg-white")}
+                                className={inputClasses}
                                 min="0"
                             />
                         </div>
@@ -495,7 +500,7 @@ const OpportunityForm = ({ onSuccess, customSubmitFunction }) => {
                                 name="currency"
                                 value={formData.currency}
                                 onChange={handleChange}
-                                className={inputClasses.replace("bg-[var(--color-academia-cream)]", "bg-white")}
+                                className={inputClasses}
                             >
                                 <option value="USD">USD ($)</option>
                                 <option value="EUR">EUR (€)</option>
