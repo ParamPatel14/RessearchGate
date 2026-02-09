@@ -2,9 +2,9 @@
 
 **ResearchMatch** is a comprehensive platform designed to bridge the gap between students and academic research opportunities. Built with a "Deep Academia" aesthetic (Ivy League Modern), it facilitates intelligent connections between students, mentors, and research labs using advanced AI matching, research intelligence, and streamlined application workflows.
 
-## 🌟 Key Features
+## Key Features
 
-### 🎓 Student Portal
+###  Student Portal
 *   **Smart Profile:** Comprehensive profile management including academic stats, skills, publications, and resume parsing.
 *   **AI-Powered Matching:** "Smart Match" system uses a 3-Lens Architecture (Domain Filtering, Semantic Similarity, Profile Alignment) to recommend the best mentors and opportunities.
 *   **Research Intelligence:**
@@ -34,7 +34,7 @@
 *   **WhatsApp Integration:** Twilio-powered notifications and updates.
 *   **Meeting Scheduler:** Integrated tools for scheduling mentorship sessions.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Backend
 *   **Framework:** FastAPI (Python)
